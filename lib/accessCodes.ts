@@ -16,7 +16,7 @@ export const ACCESS_CODES: AccessCodeRecord[] = [
     active: true,
     firstName: "00",
     lastName: "00",
-    label: "Estudiante 001"
+    label: "Estudiante 000"
   },
   {
     code: "SEM-2026-001",
