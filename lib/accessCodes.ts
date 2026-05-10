@@ -104,7 +104,11 @@ export function getAccessRecord(code: string): AccessCodeRecord | undefined {
   );
 }
 
-export function validateRegisteredStudent(firstName: string, lastName: string, code: string) {
+export function validateRegisteredStudent(
+  firstName: string,
+  lastName: string,
+  code: string
+) {
   const record = getAccessRecord(code);
 
   if (!record) {
