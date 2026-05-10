@@ -137,3 +137,6 @@ export function validateRegisteredStudent(
     record
   };
 }
+export function isValidAccessCode(code: string): boolean {
+  return Boolean(getAccessRecord(code));
+}
