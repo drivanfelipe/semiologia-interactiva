@@ -11,67 +11,74 @@ export type AccessCodeRecord = {
 // El sistema no distingue mayúsculas/minúsculas ni tildes.
 
 export const ACCESS_CODES: AccessCodeRecord[] = [
+{
+    code: "SEM-2026-000",
+    active: true,
+    firstName: "00",
+    lastName: "00",
+    label: "Estudiante 001"
+  },
   {
     code: "SEM-2026-001",
     active: true,
-    firstName: "IVAN FELIPE",
-    lastName: "MONTOYA",
+    firstName: "MARIA JOSE",
+    lastName: "BUSTOS",
     label: "Estudiante 001"
   },
   {
     code: "SEM-2026-002",
     active: true,
-    firstName: "NOMBRE2",
-    lastName: "APELLIDO2",
+    firstName: "LUCIA",
+    lastName: "CABALLERO",
     label: "Estudiante 002"
   },
   {
     code: "SEM-2026-003",
     active: true,
-    firstName: "NOMBRE3",
-    lastName: "APELLIDO3",
+    firstName: "ESTEFANIA",
+    lastName: "CANO",
     label: "Estudiante 003"
   },
   {
     code: "SEM-2026-004",
     active: true,
-    firstName: "NOMBRE4",
-    lastName: "APELLIDO4",
+    firstName: "KAROL",
+    lastName: "CHAVERRA",
     label: "Estudiante 004"
   },
   {
     code: "SEM-2026-005",
     active: true,
-    firstName: "NOMBRE5",
-    lastName: "APELLIDO5",
+    firstName: "CAROLINA",
+    lastName: "CORREA",
     label: "Estudiante 005"
   },
   {
     code: "SEM-2026-006",
     active: true,
-    firstName: "NOMBRE6",
-    lastName: "APELLIDO6",
+    firstName: "KATHALINA",
+    lastName: "CRIOLLO",
     label: "Estudiante 006"
   },
   {
     code: "SEM-2026-007",
     active: true,
-    firstName: "NOMBRE7",
-    lastName: "APELLIDO7",
+    firstName: "CAMILO",
+    lastName: "LONDOÑO",
     label: "Estudiante 007"
   },
   {
     code: "SEM-2026-008",
     active: true,
-    firstName: "NOMBRE8",
-    lastName: "APELLIDO8",
+    firstName: "VALENTINA",
+    lastName: "RODRIGUEZ",
     label: "Estudiante 008"
   },
   {
     code: "SEM-2026-009",
     active: true,
-    firstName: "NOMBRE9",
-    lastName: "APELLIDO9",
+    firstName: "LAURA",
+    lastName: "RUA",
     label: "Estudiante 009"
   }
 ];
