@@ -21,7 +21,12 @@ export async function POST(request: Request) {
 
     if (!validation.valid || !validation.record) {
       return NextResponse.json(
-        { ok: false, error: validation.error || "Datos de acceso inválidos." },
+        {
+          ok: false,
+          error:
+            validation.error ||
+            "El nombre, apellido o código no coinciden con el registro asignado."
+        },
         { status: 401 }
       );
     }

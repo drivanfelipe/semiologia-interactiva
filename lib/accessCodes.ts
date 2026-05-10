@@ -6,19 +6,17 @@ export type AccessCodeRecord = {
   label?: string;
 };
 
-// IMPORTANTE:
-// Cambia NOMBRE y APELLIDO por los datos reales de tus 9 estudiantes.
-// El sistema no distingue mayúsculas/minúsculas ni tildes.
+// El sistema ignora mayúsculas, minúsculas y tildes.
 
 export const ACCESS_CODES: AccessCodeRecord[] = [
-{
-    code: "SEM-2026-000",
-    active: true,
-    firstName: "00",
-    lastName: "00",
-    label: "Estudiante 000"
-  },
   {
+    code: "PROFESOR",
+    active: true,
+    firstName: "PROFESOR",
+    lastName: "PROFESOR",
+    label: "PROFESOR"
+  },  
+{
     code: "SEM-2026-001",
     active: true,
     firstName: "MARIA JOSE",
@@ -56,15 +54,15 @@ export const ACCESS_CODES: AccessCodeRecord[] = [
   {
     code: "SEM-2026-006",
     active: true,
-    firstName: "KATHALINA",
-    lastName: "CRIOLLO",
+    firstName: "NOMBRE6",
+    lastName: "APELLIDO6",
     label: "Estudiante 006"
   },
   {
     code: "SEM-2026-007",
     active: true,
     firstName: "CAMILO",
-    lastName: "LONDOÑO",
+    lastName: "RESTREPO",
     label: "Estudiante 007"
   },
   {
