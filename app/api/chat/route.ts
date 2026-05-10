@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { isValidAccessCode } from "../../../lib/accessCodes";
+import { getCaseById } from "../../../lib/cases";
 import { buildPatientPrompt } from "../../../lib/prompts";
 import {
   cleanText,
@@ -89,6 +90,7 @@ export async function POST(request: Request) {
     const code = cleanText(body?.student?.code);
     const studentMessage = cleanText(body?.message);
     const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
+    const selectedCase = getCaseById(body?.caseId);
 
     if (!isValidAccessCode(code)) {
       return NextResponse.json(
@@ -129,12 +131,6 @@ export async function POST(request: Request) {
       });
     }
 
-    /*
-      Regla dura:
-      Si el estudiante solo saluda o hace conversación social básica,
-      NO se llama al modelo de IA. Así evitamos que la paciente revele síntomas
-      o pistas clínicas antes de que se le pregunte el motivo de consulta.
-    */
     if (isSimpleGreeting(studentMessage)) {
       return NextResponse.json({
         ok: true,
@@ -162,20 +158,23 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY
     });
 
-    const prompt = buildPatientPrompt([
-      ...messages,
-      {
-        role: "student",
-        content: studentMessage
-      }
-    ]);
+    const prompt = buildPatientPrompt(
+      [
+        ...messages,
+        {
+          role: "student",
+          content: studentMessage
+        }
+      ],
+      selectedCase
+    );
 
     const model = process.env.OPENAI_MODEL_CHAT || "gpt-5-mini";
 
     const response = await client.responses.create({
       model,
       input: prompt,
-      max_output_tokens: 450
+      max_output_tokens: 180
     });
 
     const reply =

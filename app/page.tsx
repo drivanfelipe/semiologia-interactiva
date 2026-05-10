@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { INITIAL_CASE_MESSAGE } from "../lib/caseData";
 
 type Student = {
   firstName: string;
@@ -9,12 +8,19 @@ type Student = {
   code: string;
 };
 
+type CaseOption = {
+  id: string;
+  publicLabel: string;
+  publicSex: string;
+  publicAge: number;
+};
+
 type ChatMessage = {
   role: "student" | "patient" | "system";
   content: string;
 };
 
-type Step = "login" | "chat" | "diagnosis" | "evaluation";
+type Step = "login" | "selectCase" | "chat" | "diagnosis" | "evaluation";
 
 const CONSULTATION_LIMIT_SECONDS = 30 * 60;
 
@@ -31,6 +37,8 @@ export default function HomePage() {
   const [lastName, setLastName] = useState("");
   const [code, setCode] = useState("");
   const [student, setStudent] = useState<Student | null>(null);
+  const [caseOptions, setCaseOptions] = useState<CaseOption[]>([]);
+  const [selectedCaseId, setSelectedCaseId] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
   const [diagnosticImpression, setDiagnosticImpression] = useState("");
@@ -47,6 +55,10 @@ export default function HomePage() {
     if (!student) return "";
     return `${student.firstName} ${student.lastName}`.trim();
   }, [student]);
+
+  const selectedCase = useMemo(() => {
+    return caseOptions.find((item) => item.id === selectedCaseId) || null;
+  }, [caseOptions, selectedCaseId]);
 
   const consultationIsOver = remainingSeconds <= 0;
 
@@ -72,6 +84,17 @@ export default function HomePage() {
     return () => window.clearInterval(interval);
   }, [step, suspended, timeExpired]);
 
+  async function loadCaseOptions() {
+    const res = await fetch("/api/cases");
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "No se pudieron cargar los pacientes.");
+    }
+
+    setCaseOptions(data.cases);
+  }
+
   async function startSession(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -90,14 +113,17 @@ export default function HomePage() {
         throw new Error(data.error || "No se pudo iniciar.");
       }
 
+      await loadCaseOptions();
+
       setStudent(data.student);
-      setMessages([{ role: "system", content: INITIAL_CASE_MESSAGE }]);
+      setMessages([]);
+      setSelectedCaseId("");
       setRemainingSeconds(CONSULTATION_LIMIT_SECONDS);
       setTimeExpired(false);
       setSuspended(false);
       setDiagnosticImpression("");
       setEvaluation("");
-      setStep("chat");
+      setStep("selectCase");
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo iniciar.");
     } finally {
@@ -105,10 +131,25 @@ export default function HomePage() {
     }
   }
 
+  function chooseCase(caseOption: CaseOption) {
+    setSelectedCaseId(caseOption.id);
+    setMessages([
+      {
+        role: "system",
+        content: `Ha seleccionado ${caseOption.publicLabel}: ${caseOption.publicSex}, ${caseOption.publicAge} años.\n\nUsted se encuentra en consulta externa. Inicie la entrevista con la persona simulada.`
+      }
+    ]);
+    setRemainingSeconds(CONSULTATION_LIMIT_SECONDS);
+    setTimeExpired(false);
+    setSuspended(false);
+    setError("");
+    setStep("chat");
+  }
+
   async function sendMessage(event?: React.FormEvent<HTMLFormElement>) {
     event?.preventDefault();
 
-    if (!student || !message.trim() || loading || suspended) return;
+    if (!student || !message.trim() || loading || suspended || !selectedCaseId) return;
 
     if (consultationIsOver) {
       setTimeExpired(true);
@@ -137,6 +178,7 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           student,
+          caseId: selectedCaseId,
           message: currentMessage,
           messages: messages.filter((m) => m.role !== "system")
         })
@@ -173,7 +215,7 @@ export default function HomePage() {
   async function evaluateCase(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!student || !diagnosticImpression.trim() || loading) return;
+    if (!student || !diagnosticImpression.trim() || loading || !selectedCaseId) return;
 
     setError("");
     setLoading(true);
@@ -184,6 +226,7 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           student,
+          caseId: selectedCaseId,
           diagnosticImpression,
           messages: messages.filter((m) => m.role === "student" || m.role === "patient")
         })
@@ -207,6 +250,8 @@ export default function HomePage() {
   function restart() {
     setStep("login");
     setStudent(null);
+    setCaseOptions([]);
+    setSelectedCaseId("");
     setMessages([]);
     setMessage("");
     setDiagnosticImpression("");
@@ -276,11 +321,40 @@ export default function HomePage() {
             {error && <p className="error">{error}</p>}
 
             <button className="btn" disabled={loading}>
-              {loading ? "Validando..." : "Iniciar caso"}
+              {loading ? "Validando..." : "Iniciar"}
             </button>
 
             <p className="small">Tiempo máximo de consulta: 30 minutos.</p>
           </form>
+        </section>
+      </main>
+    );
+  }
+
+  if (step === "selectCase") {
+    return (
+      <main className="container">
+        <section className="card evaluation">
+          <span className="kicker">Selección de paciente</span>
+          <h1>Elige una persona simulada</h1>
+          <p className="subtitle">
+            Solo se muestra sexo y edad. No se revela el motivo de consulta ni el objetivo académico.
+          </p>
+
+          <div className="form-grid">
+            {caseOptions.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => chooseCase(item)}
+              >
+                {item.publicLabel} — {item.publicSex}, {item.publicAge} años
+              </button>
+            ))}
+          </div>
+
+          {error && <p className="error">{error}</p>}
         </section>
       </main>
     );
@@ -343,6 +417,11 @@ export default function HomePage() {
         <div>
           <h2>Semiología Interactiva — Paciente Virtual</h2>
           <p>{studentName}</p>
+          {selectedCase && (
+            <p>
+              {selectedCase.publicLabel} — {selectedCase.publicSex}, {selectedCase.publicAge} años
+            </p>
+          )}
         </div>
 
         <div className="rules">
