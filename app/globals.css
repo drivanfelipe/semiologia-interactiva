@@ -1,20 +1,30 @@
 :root {
-  --bg: #eef4ff;
+  --bg: #edf4ff;
   --bg-2: #f8fbff;
   --panel: #ffffff;
   --panel-soft: #f8fbff;
   --text: #102033;
   --muted: #5e6b7a;
   --line: #dbe6f5;
+
   --primary: #2563eb;
   --primary-dark: #1d4ed8;
   --primary-soft: #dbeafe;
-  --danger: #b91c1c;
+
+  --danger: #dc2626;
+  --danger-dark: #b91c1c;
   --danger-soft: #fee2e2;
+
+  --warning: #9a3412;
   --warning-soft: #fff7ed;
-  --shadow: 0 22px 70px rgba(15, 23, 42, 0.12);
+
+  --success: #047857;
+  --success-soft: #ecfdf5;
+
+  --shadow: 0 24px 80px rgba(15, 23, 42, 0.13);
   --shadow-soft: 0 12px 34px rgba(15, 23, 42, 0.08);
-  --radius-xl: 28px;
+
+  --radius-xl: 30px;
   --radius-lg: 22px;
   --radius-md: 16px;
 }
@@ -29,8 +39,9 @@ body {
   min-height: 100%;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at top left, #dbeafe 0, transparent 34%),
-    radial-gradient(circle at bottom right, #e0f2fe 0, transparent 32%),
+    radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.18), transparent 30%),
+    radial-gradient(circle at 90% 18%, rgba(14, 165, 233, 0.16), transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(37, 99, 235, 0.08), transparent 30%),
     linear-gradient(135deg, var(--bg), var(--bg-2));
   color: var(--text);
 }
@@ -39,6 +50,10 @@ button,
 input,
 textarea {
   font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .container {
@@ -57,7 +72,7 @@ textarea {
 
 .card {
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
   border: 1px solid rgba(219, 230, 245, 0.9);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
@@ -72,15 +87,19 @@ textarea {
   overflow: hidden;
 }
 
-.brand-card::after {
+.brand-card::before {
   content: "";
   position: absolute;
-  right: -90px;
-  bottom: -90px;
-  width: 260px;
-  height: 260px;
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.1);
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.08), transparent 34%);
+  pointer-events: none;
+}
+
+.brand-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .kicker {
@@ -90,8 +109,9 @@ textarea {
   border-radius: 999px;
   background: var(--primary-soft);
   color: #1e40af;
-  font-weight: 800;
+  font-weight: 850;
   font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 h1 {
@@ -124,20 +144,16 @@ h2 {
   margin-top: 28px;
   padding: 18px;
   border-radius: var(--radius-lg);
-  background: var(--panel-soft);
+  background: rgba(248, 251, 255, 0.88);
   border: 1px solid var(--line);
   color: var(--muted);
   line-height: 1.5;
-  position: relative;
-  z-index: 1;
 }
 
 .feature-list {
   display: grid;
   gap: 12px;
   margin: 28px 0;
-  position: relative;
-  z-index: 1;
 }
 
 .feature-list div {
@@ -171,7 +187,7 @@ label {
   display: grid;
   gap: 8px;
   color: var(--muted);
-  font-weight: 700;
+  font-weight: 750;
   font-size: 14px;
 }
 
@@ -202,17 +218,21 @@ textarea:focus {
   border: 0;
   border-radius: 18px;
   padding: 14px 18px;
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
   font-weight: 850;
   cursor: pointer;
   transition: 0.18s ease;
-  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.24);
 }
 
 .btn:hover {
-  background: var(--primary-dark);
   transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.28);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn:disabled {
@@ -234,16 +254,12 @@ textarea:focus {
 }
 
 .btn-danger {
-  background: #dc2626;
-  box-shadow: 0 10px 22px rgba(220, 38, 38, 0.18);
-}
-
-.btn-danger:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+  box-shadow: 0 12px 26px rgba(220, 38, 38, 0.18);
 }
 
 .error {
-  color: var(--danger);
+  color: var(--danger-dark);
   background: var(--danger-soft);
   border: 1px solid #fecaca;
   border-radius: var(--radius-md);
@@ -251,6 +267,8 @@ textarea:focus {
   font-weight: 750;
   line-height: 1.4;
 }
+
+/* Selección de pacientes */
 
 .select-layout {
   display: grid;
@@ -269,7 +287,7 @@ textarea:focus {
   gap: 8px;
   padding: 18px;
   border-radius: 22px;
-  background: #f8fbff;
+  background: rgba(248, 251, 255, 0.9);
   border: 1px solid var(--line);
   color: var(--muted);
 }
@@ -295,21 +313,40 @@ textarea:focus {
   border-radius: 28px;
   border: 1px solid var(--line);
   background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 34%),
-    white;
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.13), transparent 34%),
+    linear-gradient(180deg, white, #f8fbff);
   box-shadow: var(--shadow-soft);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   color: var(--text);
-  transition: 0.2s ease;
+  transition: 0.22s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.case-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -40px -70px auto;
+  width: 150px;
+  height: 150px;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 999px;
 }
 
 .case-card:hover {
   transform: translateY(-5px);
   border-color: rgba(37, 99, 235, 0.45);
   box-shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
+}
+
+.case-card-top,
+.case-card > div,
+.case-action {
+  position: relative;
+  z-index: 1;
 }
 
 .case-card-top {
@@ -324,9 +361,10 @@ textarea:focus {
   border-radius: 16px;
   display: grid;
   place-items: center;
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
-  font-weight: 900;
+  font-weight: 950;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
 }
 
 .case-chip {
@@ -335,7 +373,7 @@ textarea:focus {
   background: #edf4ff;
   color: #1d4ed8;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 850;
 }
 
 .case-card h2 {
@@ -355,41 +393,49 @@ textarea:focus {
   border-radius: 16px;
   background: #fff7ed;
   color: #9a3412;
-  font-weight: 800;
+  font-weight: 850;
   border: 1px solid #fed7aa;
 }
 
 .case-action {
   color: var(--primary);
-  font-weight: 900;
+  font-weight: 950;
 }
+
+/* Chat */
 
 .app-shell {
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: calc(100vh - 32px);
   margin: 16px auto;
-  width: min(1120px, calc(100% - 24px));
+  width: min(1180px, calc(100% - 24px));
   overflow: hidden;
+  border-radius: 34px;
 }
 
 .topbar {
   padding: 18px 22px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(219, 230, 245, 0.95);
   display: flex;
   gap: 18px;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.86);
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.13), transparent 30%),
+    rgba(255, 255, 255, 0.9);
 }
 
 .topbar h2 {
   margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.045em;
 }
 
 .topbar p {
   margin: 4px 0 0;
   color: var(--muted);
+  font-weight: 650;
 }
 
 .rules {
@@ -405,39 +451,91 @@ textarea:focus {
   background: #edf4ff;
   color: #1d4ed8;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 850;
   border: 1px solid #dbeafe;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.08);
 }
 
 .timer-pill {
-  background: #eff6ff;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
   color: #1d4ed8;
+  position: relative;
+  padding-left: 28px;
+}
+
+.timer-pill::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.15);
 }
 
 .chat {
   overflow-y: auto;
-  padding: 24px;
+  padding: 26px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   background:
-    linear-gradient(180deg, rgba(248, 251, 255, 0.86), rgba(255, 255, 255, 0.72)),
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 32%);
+    linear-gradient(rgba(248, 251, 255, 0.9), rgba(255, 255, 255, 0.75)),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+  background-size: auto, 28px 28px, 28px 28px;
+  position: relative;
+}
+
+.chat::before {
+  content: "Consulta simulada";
+  position: sticky;
+  top: 0;
+  align-self: center;
+  z-index: 2;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+  backdrop-filter: blur(10px);
+  margin-bottom: 2px;
 }
 
 .message {
-  max-width: 78%;
+  max-width: min(78%, 760px);
   padding: 14px 16px;
-  border-radius: 20px;
+  border-radius: 22px;
   white-space: pre-wrap;
   line-height: 1.55;
   border: 1px solid var(--line);
   box-shadow: var(--shadow-soft);
+  position: relative;
+  animation: messageIn 0.18s ease both;
 }
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Paciente */
 
 .message.patient {
   align-self: flex-start;
-  background: white;
+  margin-left: 44px;
+  background: rgba(255, 255, 255, 0.98);
   border-bottom-left-radius: 8px;
 }
 
@@ -447,15 +545,36 @@ textarea:focus {
   margin-bottom: 5px;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 850;
 }
+
+.message.patient::after {
+  content: "PV";
+  position: absolute;
+  left: -44px;
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: #e0ecff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 950;
+  border: 1px solid #bfdbfe;
+}
+
+/* Estudiante */
 
 .message.student {
   align-self: flex-end;
-  background: var(--primary);
+  margin-right: 44px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
-  border-color: var(--primary);
+  border-color: rgba(37, 99, 235, 0.75);
   border-bottom-right-radius: 8px;
+  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.22);
 }
 
 .message.student::before {
@@ -464,8 +583,27 @@ textarea:focus {
   margin-bottom: 5px;
   color: rgba(255, 255, 255, 0.78);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 850;
 }
+
+.message.student::after {
+  content: "E";
+  position: absolute;
+  right: -44px;
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: #1d4ed8;
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Sistema */
 
 .message.system {
   align-self: center;
@@ -487,20 +625,42 @@ textarea:focus {
   font-weight: 850;
 }
 
+/* Burbuja de cargando */
+
+.message.patient:has(+ div) {
+  scroll-margin-bottom: 100px;
+}
+
+/* Composer */
+
 .composer {
   padding: 16px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(219, 230, 245, 0.95);
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: 10px;
-  background: white;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,251,255,0.96));
 }
 
 .composer textarea {
-  min-height: 56px;
-  max-height: 130px;
+  min-height: 58px;
+  max-height: 140px;
   resize: vertical;
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.03);
 }
+
+.composer textarea::placeholder {
+  color: #8a96a6;
+}
+
+.composer .btn {
+  min-width: 112px;
+}
+
+/* Evaluación */
 
 .evaluation {
   padding: 32px;
@@ -516,7 +676,10 @@ textarea:focus {
   padding: 20px;
   line-height: 1.6;
   overflow-x: auto;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
 }
+
+/* Responsive */
 
 @media (max-width: 900px) {
   .container {
@@ -558,8 +721,220 @@ textarea:focus {
     padding: 14px;
   }
 
+  .topbar h2 {
+    font-size: 22px;
+  }
+
   .rules {
     justify-content: flex-start;
+  }
+
+  .chat {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .chat::before {
+    font-size: 11px;
+  }
+
+  .message {
+    max-width: calc(100% - 46px);
+  }
+
+  .message.patient {
+    margin-left: 38px;
+  }
+
+  .message.patient::after {
+    left: -38px;
+  }
+
+  .message.student {
+    margin-right: 38px;
+  }
+
+  .message.student::after {
+    right: -38px;
+  }
+
+  .composer {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .composer .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  h1 {
+    font-size: clamp(36px, 12vw, 52px);
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .kicker {
+    font-size: 12px;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+
+  .timer-pill {
+    padding-left: 25px;
+  }
+
+  input,
+  textarea,
+  .btn {
+    border-radius: 14px;
+  }
+
+  .message {
+    font-size: 15px;
+  }
+}
+/* Ajuste fino del chat: más compacto, elegante y centrado */
+
+.app-shell {
+  width: min(1080px, calc(100% - 32px));
+  height: calc(100vh - 28px);
+  border-radius: 30px;
+}
+
+.topbar {
+  padding: 16px 20px;
+}
+
+.topbar h2 {
+  font-size: 23px;
+}
+
+.topbar p {
+  font-size: 15px;
+}
+
+.rules {
+  gap: 10px;
+}
+
+.pill {
+  font-size: 12px;
+  padding: 8px 13px;
+}
+
+.chat {
+  padding: 22px clamp(18px, 5vw, 86px);
+  gap: 12px;
+  background:
+    linear-gradient(180deg, rgba(248, 251, 255, 0.92), rgba(255, 255, 255, 0.82)),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.06), transparent 32%);
+}
+
+.chat::before {
+  margin-bottom: 8px;
+  font-size: 11px;
+  padding: 6px 11px;
+  opacity: 0.9;
+}
+
+.message {
+  max-width: min(640px, 82%);
+  padding: 13px 16px;
+  border-radius: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
+}
+
+.message::before {
+  font-size: 11px !important;
+  margin-bottom: 4px !important;
+}
+
+.message.patient {
+  margin-left: 38px;
+  border-bottom-left-radius: 7px;
+}
+
+.message.patient::after {
+  left: -38px;
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+  font-size: 10px;
+}
+
+.message.student {
+  margin-right: 38px;
+  border-bottom-right-radius: 7px;
+}
+
+.message.student::after {
+  right: -38px;
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.message.system {
+  max-width: min(680px, 90%);
+  padding: 14px 18px;
+  background: #fff8ed;
+  border-color: #fed7aa;
+  color: #8a3412;
+  box-shadow: 0 10px 26px rgba(154, 52, 18, 0.06);
+}
+
+.message.system::before {
+  font-size: 11px !important;
+  margin-bottom: 5px !important;
+}
+
+.composer {
+  padding: 14px 18px;
+  grid-template-columns: 1fr 116px 126px;
+  gap: 12px;
+}
+
+.composer textarea {
+  min-height: 54px;
+  max-height: 120px;
+  padding: 15px 17px;
+  border-radius: 18px;
+}
+
+.composer .btn {
+  border-radius: 18px;
+  min-width: auto;
+}
+
+/* Hace que el primer mensaje del sistema no se vea tan gigante */
+.message.system:first-child {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+/* Mejor visual para el modo profesor */
+.timer-pill {
+  font-weight: 900;
+}
+
+/* Móvil */
+@media (max-width: 900px) {
+  .app-shell {
+    width: 100%;
+    height: 100dvh;
+    margin: 0;
+    border-radius: 0;
   }
 
   .chat {
@@ -567,14 +942,45 @@ textarea:focus {
   }
 
   .message {
-    max-width: 92%;
+    max-width: calc(100% - 44px);
+    font-size: 15px;
   }
 
   .composer {
     grid-template-columns: 1fr;
+    padding: 12px;
   }
 
   .composer .btn {
     width: 100%;
+  }
+}
+
+/* Crédito de desarrollo */
+
+body::after {
+  content: "Desarrollado por Dr. Iván Felipe Montoya Muñoz";
+  position: fixed;
+  right: 18px;
+  bottom: 10px;
+  z-index: 50;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(219, 230, 245, 0.95);
+  color: #5e6b7a;
+  font-size: 12px;
+  font-weight: 750;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 700px) {
+  body::after {
+    left: 12px;
+    right: 12px;
+    bottom: 8px;
+    text-align: center;
+    font-size: 11px;
   }
 }

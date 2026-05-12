@@ -1,6 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type DragEvent,
+  type FormEvent,
+  type KeyboardEvent
+} from "react";
 
 type Student = {
   firstName: string;
@@ -116,6 +125,30 @@ function saveStoredMessages(studentCode: string, caseId: string, messages: ChatM
   );
 }
 
+function blockClipboardAction(
+  event: ClipboardEvent<HTMLTextAreaElement> | DragEvent<HTMLTextAreaElement>
+) {
+  event.preventDefault();
+  alert(
+    "Para esta práctica no está permitido copiar, pegar, cortar o arrastrar texto. Debes escribir manualmente."
+  );
+}
+
+function blockClipboardKeys(event: KeyboardEvent<HTMLTextAreaElement>) {
+  const key = event.key.toLowerCase();
+
+  const isClipboardShortcut =
+    (event.ctrlKey || event.metaKey) &&
+    (key === "v" || key === "c" || key === "x" || key === "a");
+
+  if (isClipboardShortcut) {
+    event.preventDefault();
+    alert(
+      "Para esta práctica no está permitido usar copiar, pegar, cortar o seleccionar todo."
+    );
+  }
+}
+
 export default function HomePage() {
   const [step, setStep] = useState<Step>("login");
   const [firstName, setFirstName] = useState("");
@@ -194,7 +227,7 @@ export default function HomePage() {
     setCaseOptions(data.cases);
   }
 
-  async function startSession(event: React.FormEvent<HTMLFormElement>) {
+  async function startSession(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setLoading(true);
@@ -235,6 +268,7 @@ export default function HomePage() {
     if (!student) return;
 
     const isProfessor = isProfessorUser(student);
+
     const startedAt = isProfessor
       ? Date.now()
       : getOrCreateStartTime(student.code, caseOption.id);
@@ -272,7 +306,7 @@ export default function HomePage() {
     setStep("chat");
   }
 
-  async function sendMessage(event?: React.FormEvent<HTMLFormElement>) {
+  async function sendMessage(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
 
     if (!student || !message.trim() || loading || suspended || !selectedCaseId) return;
@@ -338,7 +372,7 @@ export default function HomePage() {
     }
   }
 
-  async function evaluateCase(event: React.FormEvent<HTMLFormElement>) {
+  async function evaluateCase(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!student || !diagnosticImpression.trim() || loading || !selectedCaseId) return;
@@ -459,6 +493,7 @@ export default function HomePage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="572698"
+                inputMode="numeric"
               />
             </label>
 
@@ -494,6 +529,7 @@ export default function HomePage() {
               <p>Realiza una entrevista clínica organizada.</p>
               <p>Máximo 3 preguntas por mensaje.</p>
               <p>Puedes solicitar examen físico u observación dirigida.</p>
+              <p>No está permitido copiar, pegar, cortar o arrastrar texto en el chat.</p>
               <p>
                 {professorMode
                   ? "Modo profesor activo: no tendrás límite de tiempo."
@@ -559,6 +595,12 @@ export default function HomePage() {
             <textarea
               value={diagnosticImpression}
               onChange={(e) => setDiagnosticImpression(e.target.value)}
+              onPaste={blockClipboardAction}
+              onCopy={blockClipboardAction}
+              onCut={blockClipboardAction}
+              onDrop={blockClipboardAction}
+              onContextMenu={(e) => e.preventDefault()}
+              onKeyDown={blockClipboardKeys}
               placeholder="Escribe aquí tu impresión final..."
             />
 
@@ -607,6 +649,7 @@ export default function HomePage() {
           </span>
           <span className="pill">Máx. 3 preguntas por mensaje</span>
           <span className="pill">Examen físico permitido</span>
+          <span className="pill">Sin copiar/pegar</span>
         </div>
       </header>
 
@@ -632,7 +675,18 @@ export default function HomePage() {
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onPaste={blockClipboardAction}
+          onCopy={blockClipboardAction}
+          onCut={blockClipboardAction}
+          onDrop={blockClipboardAction}
+          onContextMenu={(e) => e.preventDefault()}
           onKeyDown={(e) => {
+            blockClipboardKeys(e);
+
+            if (e.defaultPrevented) {
+              return;
+            }
+
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               void sendMessage();
