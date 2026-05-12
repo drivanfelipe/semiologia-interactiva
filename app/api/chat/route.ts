@@ -7,9 +7,9 @@ import {
   cleanText,
   detectNonConversationalPattern,
   getMaxStudentMessages,
-  hasTooManyQuestions,
-  Message
+  hasTooManyQuestions
 } from "../../../lib/validators";
+import type { Message } from "../../../lib/validators";
 
 export const runtime = "nodejs";
 
@@ -73,6 +73,39 @@ function getGreetingReply(message: string): string {
   return "Buenos días, doctor.";
 }
 
+function isChiefComplaintQuestion(message: string): boolean {
+  const normalized = normalizeForIntent(message);
+
+  const chiefComplaintQuestions = [
+    "que le pasa",
+    "que le ocurre",
+    "que siente",
+    "que tiene",
+    "que le molesta",
+    "que le duele",
+    "que lo trae",
+    "que la trae",
+    "que lo trae hoy",
+    "que la trae hoy",
+    "cual es el motivo de consulta",
+    "cual es su motivo de consulta",
+    "cual es la razon de consulta",
+    "en que le puedo ayudar",
+    "cuenteme que le pasa",
+    "cuenteme que siente",
+    "cuenteme que le ocurre",
+    "cuenteme por que consulta",
+    "por que consulta",
+    "por que vino",
+    "por que viene",
+    "a que viene",
+    "cual es su problema",
+    "cual es el problema"
+  ];
+
+  return normalized.length <= 120 && chiefComplaintQuestions.includes(normalized);
+}
+
 export async function POST(request: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -131,10 +164,29 @@ export async function POST(request: Request) {
       });
     }
 
+    /*
+      Regla dura:
+      Si el estudiante solo saluda, la app responde directamente
+      sin llamar al modelo. Así evitamos que el paciente revele datos clínicos.
+    */
     if (isSimpleGreeting(studentMessage)) {
       return NextResponse.json({
         ok: true,
         reply: getGreetingReply(studentMessage)
+      });
+    }
+
+    /*
+      Regla dura:
+      Si el estudiante pregunta de forma abierta por el motivo de consulta,
+      la app responde únicamente el motivo principal del caso seleccionado.
+      Esto evita que la IA entregue duración, síntomas asociados,
+      antecedentes o hallazgos antes de que el estudiante los indague.
+    */
+    if (isChiefComplaintQuestion(studentMessage)) {
+      return NextResponse.json({
+        ok: true,
+        reply: selectedCase.mainComplaint
       });
     }
 
