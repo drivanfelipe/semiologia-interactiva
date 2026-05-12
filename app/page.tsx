@@ -23,12 +23,82 @@ type ChatMessage = {
 type Step = "login" | "selectCase" | "chat" | "diagnosis" | "evaluation";
 
 const CONSULTATION_LIMIT_SECONDS = 30 * 60;
+const STORAGE_PREFIX = "semiologia-interactiva";
 
 function formatTime(totalSeconds: number): string {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
+  const safeSeconds = Math.max(0, totalSeconds);
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
 
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function normalizeStorageValue(value: string): string {
+  return value.trim().toUpperCase().replace(/\s+/g, "-");
+}
+
+function getSessionKey(studentCode: string, caseId: string): string {
+  return `${STORAGE_PREFIX}:started-at:${normalizeStorageValue(studentCode)}:${caseId}`;
+}
+
+function getMessagesKey(studentCode: string, caseId: string): string {
+  return `${STORAGE_PREFIX}:messages:${normalizeStorageValue(studentCode)}:${caseId}`;
+}
+
+function getStoredStartTime(studentCode: string, caseId: string): number | null {
+  if (typeof window === "undefined") return null;
+
+  const rawValue = window.localStorage.getItem(getSessionKey(studentCode, caseId));
+  const parsedValue = rawValue ? Number(rawValue) : NaN;
+
+  return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : null;
+}
+
+function getOrCreateStartTime(studentCode: string, caseId: string): number {
+  const existingStartTime = getStoredStartTime(studentCode, caseId);
+
+  if (existingStartTime) {
+    return existingStartTime;
+  }
+
+  const newStartTime = Date.now();
+  window.localStorage.setItem(getSessionKey(studentCode, caseId), String(newStartTime));
+
+  return newStartTime;
+}
+
+function calculateRemainingSeconds(startedAt: number): number {
+  const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
+  return Math.max(0, CONSULTATION_LIMIT_SECONDS - elapsedSeconds);
+}
+
+function loadStoredMessages(studentCode: string, caseId: string): ChatMessage[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const rawValue = window.localStorage.getItem(getMessagesKey(studentCode, caseId));
+    const parsedValue = rawValue ? JSON.parse(rawValue) : [];
+
+    if (!Array.isArray(parsedValue)) return [];
+
+    return parsedValue.filter(
+      (item) =>
+        item &&
+        (item.role === "student" || item.role === "patient" || item.role === "system") &&
+        typeof item.content === "string"
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredMessages(studentCode: string, caseId: string, messages: ChatMessage[]) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.setItem(
+    getMessagesKey(studentCode, caseId),
+    JSON.stringify(messages)
+  );
 }
 
 export default function HomePage() {
@@ -39,6 +109,7 @@ export default function HomePage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [caseOptions, setCaseOptions] = useState<CaseOption[]>([]);
   const [selectedCaseId, setSelectedCaseId] = useState("");
+  const [caseStartedAt, setCaseStartedAt] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
   const [diagnosticImpression, setDiagnosticImpression] = useState("");
@@ -63,26 +134,31 @@ export default function HomePage() {
   const consultationIsOver = remainingSeconds <= 0;
 
   useEffect(() => {
-    if (step !== "chat") return;
-    if (suspended) return;
-    if (timeExpired) return;
+    if (step !== "chat" || !caseStartedAt) return;
 
-    const interval = window.setInterval(() => {
-      setRemainingSeconds((current) => {
-        if (current <= 1) {
-          window.clearInterval(interval);
-          setTimeExpired(true);
-          setError("");
-          setStep("diagnosis");
-          return 0;
-        }
+    const tick = () => {
+      const remaining = calculateRemainingSeconds(caseStartedAt);
+      setRemainingSeconds(remaining);
 
-        return current - 1;
-      });
-    }, 1000);
+      if (remaining <= 0) {
+        setTimeExpired(true);
+        setError("");
+        setStep("diagnosis");
+      }
+    };
+
+    tick();
+
+    const interval = window.setInterval(tick, 1000);
 
     return () => window.clearInterval(interval);
-  }, [step, suspended, timeExpired]);
+  }, [step, caseStartedAt]);
+
+  useEffect(() => {
+    if (!student || !selectedCaseId || messages.length === 0) return;
+
+    saveStoredMessages(student.code, selectedCaseId, messages);
+  }, [student, selectedCaseId, messages]);
 
   async function loadCaseOptions() {
     const res = await fetch("/api/cases");
@@ -118,6 +194,7 @@ export default function HomePage() {
       setStudent(data.student);
       setMessages([]);
       setSelectedCaseId("");
+      setCaseStartedAt(null);
       setRemainingSeconds(CONSULTATION_LIMIT_SECONDS);
       setTimeExpired(false);
       setSuspended(false);
@@ -132,17 +209,35 @@ export default function HomePage() {
   }
 
   function chooseCase(caseOption: CaseOption) {
+    if (!student) return;
+
+    const startedAt = getOrCreateStartTime(student.code, caseOption.id);
+    const remaining = calculateRemainingSeconds(startedAt);
+    const storedMessages = loadStoredMessages(student.code, caseOption.id);
+
+    const initialMessages =
+      storedMessages.length > 0
+        ? storedMessages
+        : [
+            {
+              role: "system" as const,
+              content: `Ha seleccionado ${caseOption.publicLabel}: ${caseOption.publicSex}, ${caseOption.publicAge} años.\n\nUsted se encuentra en consulta externa. Inicie la entrevista con la persona simulada.`
+            }
+          ];
+
     setSelectedCaseId(caseOption.id);
-    setMessages([
-      {
-        role: "system",
-        content: `Ha seleccionado ${caseOption.publicLabel}: ${caseOption.publicSex}, ${caseOption.publicAge} años.\n\nUsted se encuentra en consulta externa. Inicie la entrevista con la persona simulada.`
-      }
-    ]);
-    setRemainingSeconds(CONSULTATION_LIMIT_SECONDS);
-    setTimeExpired(false);
+    setCaseStartedAt(startedAt);
+    setMessages(initialMessages);
+    setRemainingSeconds(remaining);
+    setTimeExpired(remaining <= 0);
     setSuspended(false);
     setError("");
+
+    if (remaining <= 0) {
+      setStep("diagnosis");
+      return;
+    }
+
     setStep("chat");
   }
 
@@ -252,6 +347,7 @@ export default function HomePage() {
     setStudent(null);
     setCaseOptions([]);
     setSelectedCaseId("");
+    setCaseStartedAt(null);
     setMessages([]);
     setMessage("");
     setDiagnosticImpression("");
@@ -324,7 +420,9 @@ export default function HomePage() {
               {loading ? "Validando..." : "Iniciar"}
             </button>
 
-            <p className="small">Tiempo máximo de consulta: 30 minutos.</p>
+            <p className="small">
+              Tiempo máximo de consulta: 30 minutos. El tiempo no se detiene si cierras la app o pierdes conexión.
+            </p>
           </form>
         </section>
       </main>

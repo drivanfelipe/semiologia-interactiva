@@ -6,7 +6,6 @@ import { buildPatientPrompt } from "../../../lib/prompts";
 import {
   cleanText,
   detectNonConversationalPattern,
-  getMaxStudentMessages,
   hasTooManyQuestions
 } from "../../../lib/validators";
 import type { Message } from "../../../lib/validators";
@@ -25,6 +24,10 @@ function normalizeForIntent(value: string): string {
     .replace(/[¿?¡!.,;:]/g, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function textIncludesAny(text: string, words: string[]): boolean {
+  return words.some((word) => text.includes(word));
 }
 
 function isSimpleGreeting(message: string): boolean {
@@ -134,10 +137,15 @@ function formatValue(value: unknown): string {
   return "";
 }
 
+function hasFinding(sectionText: string, findingWords: string[]): boolean {
+  const normalized = normalizeForIntent(sectionText);
+  return findingWords.some((word) => normalized.includes(word));
+}
+
 function getVitalSignsReply(
   normalized: string,
   physicalExam: Record<string, unknown>
-): string | null {
+): string {
   const vitalSigns = physicalExam.vitalSigns as Record<string, unknown> | undefined;
 
   if (!vitalSigns) {
@@ -167,15 +175,6 @@ function getVitalSignsReply(
   return `Signos vitales: presión arterial ${vitalSigns.bloodPressure || "no disponible"}, frecuencia cardíaca ${vitalSigns.heartRate || "no disponible"}, frecuencia respiratoria ${vitalSigns.respiratoryRate || "no disponible"}, saturación ${vitalSigns.oxygenSaturation || "no disponible"} y temperatura ${vitalSigns.temperature || "no disponible"}.`;
 }
 
-function textIncludesAny(text: string, words: string[]): boolean {
-  return words.some((word) => text.includes(word));
-}
-
-function hasFinding(sectionText: string, findingWords: string[]): boolean {
-  const normalized = normalizeForIntent(sectionText);
-  return findingWords.some((word) => normalized.includes(word));
-}
-
 function getSpecificSignReply(
   normalized: string,
   physicalExam: Record<string, unknown>
@@ -191,11 +190,27 @@ function getSpecificSignReply(
     return "No, no se aprecia onda ascítica ni signos de ascitis.";
   }
 
-  if (textIncludesAny(normalized, ["murphy", "blumberg", "rebote", "defensa abdominal", "irritacion peritoneal"])) {
+  if (
+    textIncludesAny(normalized, [
+      "murphy",
+      "blumberg",
+      "rebote",
+      "defensa abdominal",
+      "irritacion peritoneal"
+    ])
+  ) {
     return "No, ese signo no se aprecia en esta exploración.";
   }
 
-  if (textIncludesAny(normalized, ["masa abdominal", "masas abdominales", "visceromegalia", "hepatomegalia", "esplenomegalia"])) {
+  if (
+    textIncludesAny(normalized, [
+      "masa abdominal",
+      "masas abdominales",
+      "visceromegalia",
+      "hepatomegalia",
+      "esplenomegalia"
+    ])
+  ) {
     return "No, no se palpan masas ni visceromegalias.";
   }
 
@@ -247,7 +262,14 @@ function getSpecificSignReply(
     return "No, no se aprecia edema ni fóvea.";
   }
 
-  if (textIncludesAny(normalized, ["asimetria facial", "desviacion de la boca", "boca torcida", "facial"])) {
+  if (
+    textIncludesAny(normalized, [
+      "asimetria facial",
+      "desviacion de la boca",
+      "boca torcida",
+      "facial"
+    ])
+  ) {
     const cranialNerves = formatValue(neurologic?.cranialNerves);
 
     if (cranialNerves) {
@@ -257,7 +279,14 @@ function getSpecificSignReply(
     return "No, no se aprecia asimetría facial.";
   }
 
-  if (textIncludesAny(normalized, ["disartria", "habla rara", "lenguaje alterado", "alteracion del habla"])) {
+  if (
+    textIncludesAny(normalized, [
+      "disartria",
+      "habla rara",
+      "lenguaje alterado",
+      "alteracion del habla"
+    ])
+  ) {
     const speech = formatValue(neurologic?.speech);
 
     if (speech) {
@@ -395,15 +424,24 @@ function getPhysicalExamReply(
       : "Estado general: normal, no se aprecian alteraciones.";
   }
 
-  if (textIncludesAny(normalized, ["cabeza", "ojos", "pupilas", "boca", "orofaringe", "oidos"])) {
-    return "Cabeza y cuello: normal, no se aprecian alteraciones relevantes.";
-  }
-
   if (textIncludesAny(normalized, ["cuello", "yugular", "yugulares"])) {
     const neck = formatValue(physicalExam.neck);
     return neck
       ? `Cuello: ${neck}`
       : "Cuello: normal, no se aprecian alteraciones.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "cabeza",
+      "ojos",
+      "pupilas",
+      "boca",
+      "orofaringe",
+      "oidos"
+    ])
+  ) {
+    return "Cabeza y cuello: normal, no se aprecian alteraciones relevantes.";
   }
 
   if (
@@ -442,6 +480,7 @@ function getPhysicalExamReply(
     textIncludesAny(normalized, [
       "abdomen",
       "abdominal",
+      "barriga",
       "epigastrio",
       "hipocondrio",
       "fosa iliaca",
@@ -470,59 +509,6 @@ function getPhysicalExamReply(
     return extremities
       ? `Extremidades: ${extremities}`
       : "Extremidades: normal, no se aprecian alteraciones.";
-  }
-
-  if (
-    textIncludesAny(normalized, [
-      "neurologico",
-      "fuerza",
-      "sensibilidad",
-      "pares craneales",
-      "cara",
-      "facial",
-      "lenguaje",
-      "habla",
-      "marcha",
-      "coordinacion",
-      "dedo nariz",
-      "reflejos"
-    ])
-  ) {
-    const neurologic = physicalExam.neurologic as Record<string, unknown> | undefined;
-
-    if (!neurologic) {
-      return "Neurológico: normal, no se aprecian alteraciones.";
-    }
-
-    if (textIncludesAny(normalized, ["fuerza", "motor"])) {
-      return `Fuerza/motor: ${formatValue(neurologic.motor)}`;
-    }
-
-    if (normalized.includes("sensibilidad")) {
-      return `Sensibilidad: ${formatValue(neurologic.sensory)}`;
-    }
-
-    if (textIncludesAny(normalized, ["pares", "cara", "facial"])) {
-      return `Pares craneales/cara: ${formatValue(neurologic.cranialNerves)}`;
-    }
-
-    if (textIncludesAny(normalized, ["lenguaje", "habla"])) {
-      return `Lenguaje/habla: ${formatValue(neurologic.speech)}`;
-    }
-
-    if (normalized.includes("marcha")) {
-      return `Marcha: ${formatValue(neurologic.gait)}`;
-    }
-
-    if (textIncludesAny(normalized, ["coordinacion", "dedo nariz"])) {
-      return `Coordinación: ${formatValue(neurologic.coordination)}`;
-    }
-
-    if (normalized.includes("reflejos")) {
-      return "Reflejos: no se aprecian alteraciones relevantes en esta simulación.";
-    }
-
-    return `Neurológico: ${formatValue(neurologic)}`;
   }
 
   if (
@@ -577,6 +563,59 @@ function getPhysicalExamReply(
     }
 
     return `Hombro: ${formatValue(shoulder.activeRangeOfMotion || shoulder.inspection || shoulder)}`;
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "neurologico",
+      "fuerza",
+      "sensibilidad",
+      "pares craneales",
+      "cara",
+      "facial",
+      "lenguaje",
+      "habla",
+      "marcha",
+      "coordinacion",
+      "dedo nariz",
+      "reflejos"
+    ])
+  ) {
+    const neurologic = physicalExam.neurologic as Record<string, unknown> | undefined;
+
+    if (!neurologic) {
+      return "Neurológico: normal, no se aprecian alteraciones.";
+    }
+
+    if (textIncludesAny(normalized, ["fuerza", "motor"])) {
+      return `Fuerza/motor: ${formatValue(neurologic.motor)}`;
+    }
+
+    if (normalized.includes("sensibilidad")) {
+      return `Sensibilidad: ${formatValue(neurologic.sensory)}`;
+    }
+
+    if (textIncludesAny(normalized, ["pares", "cara", "facial"])) {
+      return `Pares craneales/cara: ${formatValue(neurologic.cranialNerves)}`;
+    }
+
+    if (textIncludesAny(normalized, ["lenguaje", "habla"])) {
+      return `Lenguaje/habla: ${formatValue(neurologic.speech)}`;
+    }
+
+    if (normalized.includes("marcha")) {
+      return `Marcha: ${formatValue(neurologic.gait)}`;
+    }
+
+    if (textIncludesAny(normalized, ["coordinacion", "dedo nariz"])) {
+      return `Coordinación: ${formatValue(neurologic.coordination)}`;
+    }
+
+    if (normalized.includes("reflejos")) {
+      return "Reflejos: no se aprecian alteraciones relevantes en esta simulación.";
+    }
+
+    return `Neurológico: ${formatValue(neurologic)}`;
   }
 
   if (textIncludesAny(normalized, ["cervical", "columna cervical"])) {
@@ -638,18 +677,6 @@ export async function POST(request: Request) {
         content: cleanText(m.content)
       }))
       .filter((m: Message) => m.content.length > 0);
-
-    const studentMessagesCount = messages.filter(
-      (m) => m.role === "student"
-    ).length;
-
-    if (studentMessagesCount >= getMaxStudentMessages()) {
-      return NextResponse.json({
-        ok: true,
-        reply:
-          "Doctor, ya me siento muy cansada con tantas preguntas. ¿Será que podemos ir cerrando?"
-      });
-    }
 
     if (isSimpleGreeting(studentMessage)) {
       return NextResponse.json({
