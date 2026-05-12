@@ -429,7 +429,7 @@ export default function HomePage() {
               <span className="kicker">Acceso registrado</span>
               <h2>Ingreso del estudiante</h2>
               <p className="small">
-                Ingresa tus datos y el código individual entregado por el docente.
+                Ingresa tu nombre, apellido y el ID de identificación entregado por el docente.
               </p>
             </div>
 
@@ -454,11 +454,11 @@ export default function HomePage() {
             </label>
 
             <label>
-              Código individual
+              ID de identificación
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="SEM-2026-001"
+                placeholder="572698"
               />
             </label>
 
