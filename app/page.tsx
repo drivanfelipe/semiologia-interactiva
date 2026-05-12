@@ -221,7 +221,7 @@ export default function HomePage() {
         : [
             {
               role: "system" as const,
-              content: `Ha seleccionado ${caseOption.publicLabel}: ${caseOption.publicSex}, ${caseOption.publicAge} años.\n\nUsted se encuentra en consulta externa. Inicie la entrevista con la persona simulada.`
+              content: `Ha seleccionado ${caseOption.publicLabel}: ${caseOption.publicSex}, ${caseOption.publicAge} años.\n\nUsted se encuentra en una simulación clínica. Inicie la entrevista con la persona simulada.`
             }
           ];
 
@@ -365,16 +365,31 @@ export default function HomePage() {
           <div className="card brand-card">
             <div>
               <span className="kicker">Simulación académica</span>
-              <h1>Semiología Interactiva — Paciente Virtual</h1>
+              <h1>Semiología Interactiva</h1>
               <p className="subtitle">
-                Entrenamiento conversacional para estudiantes de medicina. Practica entrevista clínica,
-                comunicación, observación dirigida y construcción de una impresión final dentro de un escenario ficticio.
+                Paciente virtual para practicar entrevista clínica, observación dirigida,
+                examen físico y construcción de una impresión final.
               </p>
             </div>
 
+            <div className="feature-list">
+              <div>
+                <strong>30 minutos</strong>
+                <span>Tiempo máximo de entrevista</span>
+              </div>
+              <div>
+                <strong>3 pacientes</strong>
+                <span>Casos clínicos ocultos</span>
+              </div>
+              <div>
+                <strong>Evaluación</strong>
+                <span>Retroalimentación académica final</span>
+              </div>
+            </div>
+
             <div className="disclaimer">
-              Esta herramienta es exclusivamente educativa. No brinda atención médica real, diagnóstico para pacientes reales,
-              tratamiento ni recomendaciones terapéuticas.
+              Esta herramienta es exclusivamente educativa. No brinda atención médica real,
+              diagnóstico para pacientes reales, tratamiento ni recomendaciones terapéuticas.
             </div>
           </div>
 
@@ -382,7 +397,9 @@ export default function HomePage() {
             <div>
               <span className="kicker">Acceso registrado</span>
               <h2>Ingreso del estudiante</h2>
-              <p className="small">Ingresa tus datos y el código individual entregado por el docente.</p>
+              <p className="small">
+                Ingresa tus datos y el código individual entregado por el docente.
+              </p>
             </div>
 
             <label>
@@ -417,11 +434,11 @@ export default function HomePage() {
             {error && <p className="error">{error}</p>}
 
             <button className="btn" disabled={loading}>
-              {loading ? "Validando..." : "Iniciar"}
+              {loading ? "Validando..." : "Iniciar práctica"}
             </button>
 
             <p className="small">
-              Tiempo máximo de consulta: 30 minutos. El tiempo no se detiene si cierras la app o pierdes conexión.
+              El tiempo no se detiene si cierras la app o pierdes conexión.
             </p>
           </form>
         </section>
@@ -432,22 +449,49 @@ export default function HomePage() {
   if (step === "selectCase") {
     return (
       <main className="container">
-        <section className="card evaluation">
-          <span className="kicker">Selección de paciente</span>
-          <h1>Elige una persona simulada</h1>
-          <p className="subtitle">
-            Solo se muestra sexo y edad. No se revela el motivo de consulta ni el objetivo académico.
-          </p>
+        <section className="select-layout">
+          <div className="select-header card">
+            <span className="kicker">Selección de paciente</span>
+            <h1>Elige una persona simulada</h1>
+            <p className="subtitle">
+              Solo verás sexo y edad. El motivo de consulta, antecedentes y objetivo
+              académico permanecerán ocultos hasta que los explores durante la entrevista.
+            </p>
 
-          <div className="form-grid">
-            {caseOptions.map((item) => (
+            <div className="instruction-panel">
+              <strong>Instrucciones de la práctica</strong>
+              <p>Realiza una entrevista clínica organizada.</p>
+              <p>Máximo 3 preguntas por mensaje.</p>
+              <p>Puedes solicitar examen físico u observación dirigida.</p>
+              <p>Al terminar, presiona Finalizar y escribe tu impresión final.</p>
+            </div>
+          </div>
+
+          <div className="case-grid">
+            {caseOptions.map((item, index) => (
               <button
                 key={item.id}
                 type="button"
-                className="btn btn-secondary"
+                className="case-card"
                 onClick={() => chooseCase(item)}
               >
-                {item.publicLabel} — {item.publicSex}, {item.publicAge} años
+                <div className="case-card-top">
+                  <span className="case-number">0{index + 1}</span>
+                  <span className="case-chip">Paciente virtual</span>
+                </div>
+
+                <div>
+                  <h2>{item.publicLabel}</h2>
+                  <p className="case-meta">
+                    {item.publicSex} · {item.publicAge} años
+                  </p>
+                </div>
+
+                <div className="case-hidden">
+                  Información clínica oculta
+                </div>
+
+                <span className="case-action">Iniciar entrevista →</span>
               </button>
             ))}
           </div>
@@ -513,7 +557,7 @@ export default function HomePage() {
     <main className="card app-shell">
       <header className="topbar">
         <div>
-          <h2>Semiología Interactiva — Paciente Virtual</h2>
+          <h2>Semiología Interactiva</h2>
           <p>{studentName}</p>
           {selectedCase && (
             <p>
@@ -523,10 +567,9 @@ export default function HomePage() {
         </div>
 
         <div className="rules">
-          <span className="pill">Tiempo restante: {formatTime(remainingSeconds)}</span>
+          <span className="pill timer-pill">Tiempo: {formatTime(remainingSeconds)}</span>
           <span className="pill">Máx. 3 preguntas por mensaje</span>
-          <span className="pill">Sin plantillas pegadas</span>
-          <span className="pill">Observación dirigida permitida</span>
+          <span className="pill">Examen físico permitido</span>
         </div>
       </header>
 
