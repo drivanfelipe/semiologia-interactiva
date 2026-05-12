@@ -37,6 +37,21 @@ function normalizeStorageValue(value: string): string {
   return value.trim().toUpperCase().replace(/\s+/g, "-");
 }
 
+function isProfessorUser(student: Student | null): boolean {
+  if (!student) return false;
+
+  const normalizedCode = normalizeStorageValue(student.code);
+  const normalizedFirstName = normalizeStorageValue(student.firstName);
+  const normalizedLastName = normalizeStorageValue(student.lastName);
+
+  return (
+    normalizedCode === "PROFESOR" ||
+    normalizedCode === "SEM-PROFESOR" ||
+    normalizedFirstName === "PROFESOR" ||
+    normalizedLastName === "PROFESOR"
+  );
+}
+
 function getSessionKey(studentCode: string, caseId: string): string {
   return `${STORAGE_PREFIX}:started-at:${normalizeStorageValue(studentCode)}:${caseId}`;
 }
@@ -131,10 +146,18 @@ export default function HomePage() {
     return caseOptions.find((item) => item.id === selectedCaseId) || null;
   }, [caseOptions, selectedCaseId]);
 
-  const consultationIsOver = remainingSeconds <= 0;
+  const professorMode = useMemo(() => isProfessorUser(student), [student]);
+
+  const consultationIsOver = !professorMode && remainingSeconds <= 0;
 
   useEffect(() => {
     if (step !== "chat" || !caseStartedAt) return;
+
+    if (professorMode) {
+      setRemainingSeconds(CONSULTATION_LIMIT_SECONDS);
+      setTimeExpired(false);
+      return;
+    }
 
     const tick = () => {
       const remaining = calculateRemainingSeconds(caseStartedAt);
@@ -152,7 +175,7 @@ export default function HomePage() {
     const interval = window.setInterval(tick, 1000);
 
     return () => window.clearInterval(interval);
-  }, [step, caseStartedAt]);
+  }, [step, caseStartedAt, professorMode]);
 
   useEffect(() => {
     if (!student || !selectedCaseId || messages.length === 0) return;
@@ -211,8 +234,15 @@ export default function HomePage() {
   function chooseCase(caseOption: CaseOption) {
     if (!student) return;
 
-    const startedAt = getOrCreateStartTime(student.code, caseOption.id);
-    const remaining = calculateRemainingSeconds(startedAt);
+    const isProfessor = isProfessorUser(student);
+    const startedAt = isProfessor
+      ? Date.now()
+      : getOrCreateStartTime(student.code, caseOption.id);
+
+    const remaining = isProfessor
+      ? CONSULTATION_LIMIT_SECONDS
+      : calculateRemainingSeconds(startedAt);
+
     const storedMessages = loadStoredMessages(student.code, caseOption.id);
 
     const initialMessages =
@@ -229,11 +259,12 @@ export default function HomePage() {
     setCaseStartedAt(startedAt);
     setMessages(initialMessages);
     setRemainingSeconds(remaining);
-    setTimeExpired(remaining <= 0);
+    setTimeExpired(false);
     setSuspended(false);
     setError("");
 
-    if (remaining <= 0) {
+    if (!isProfessor && remaining <= 0) {
+      setTimeExpired(true);
       setStep("diagnosis");
       return;
     }
@@ -375,15 +406,15 @@ export default function HomePage() {
             <div className="feature-list">
               <div>
                 <strong>30 minutos</strong>
-                <span>Tiempo máximo de entrevista</span>
+                <span>Tiempo máximo de entrevista para estudiantes</span>
               </div>
               <div>
                 <strong>3 pacientes</strong>
                 <span>Casos clínicos ocultos</span>
               </div>
               <div>
-                <strong>Evaluación</strong>
-                <span>Retroalimentación académica final</span>
+                <strong>Modo profesor</strong>
+                <span>Acceso sin límite de tiempo</span>
               </div>
             </div>
 
@@ -438,7 +469,7 @@ export default function HomePage() {
             </button>
 
             <p className="small">
-              El tiempo no se detiene si cierras la app o pierdes conexión.
+              Para estudiantes, el tiempo no se detiene si cierran la app o pierden conexión.
             </p>
           </form>
         </section>
@@ -463,7 +494,11 @@ export default function HomePage() {
               <p>Realiza una entrevista clínica organizada.</p>
               <p>Máximo 3 preguntas por mensaje.</p>
               <p>Puedes solicitar examen físico u observación dirigida.</p>
-              <p>Al terminar, presiona Finalizar y escribe tu impresión final.</p>
+              <p>
+                {professorMode
+                  ? "Modo profesor activo: no tendrás límite de tiempo."
+                  : "Tienes 30 minutos. Al terminar, presiona Finalizar y escribe tu impresión final."}
+              </p>
             </div>
           </div>
 
@@ -567,7 +602,9 @@ export default function HomePage() {
         </div>
 
         <div className="rules">
-          <span className="pill timer-pill">Tiempo: {formatTime(remainingSeconds)}</span>
+          <span className="pill timer-pill">
+            {professorMode ? "Modo profesor: sin límite" : `Tiempo: ${formatTime(remainingSeconds)}`}
+          </span>
           <span className="pill">Máx. 3 preguntas por mensaje</span>
           <span className="pill">Examen físico permitido</span>
         </div>
