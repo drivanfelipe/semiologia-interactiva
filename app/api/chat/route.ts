@@ -30,6 +30,81 @@ function textIncludesAny(text: string, words: string[]): boolean {
   return words.some((word) => text.includes(word));
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function formatValue(value: unknown): string {
+  if (!value) return "";
+
+  if (typeof value === "string") return value;
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(formatValue).filter(Boolean).join(", ");
+  }
+
+  if (isRecord(value)) {
+    return Object.values(value)
+      .map(formatValue)
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return "";
+}
+
+function getSection(
+  physicalExam: Record<string, unknown>,
+  key: string
+): Record<string, unknown> | null {
+  const value = physicalExam[key];
+  return isRecord(value) ? value : null;
+}
+
+function getString(
+  physicalExam: Record<string, unknown>,
+  section: string,
+  key?: string
+): string {
+  const sectionValue = physicalExam[section];
+
+  if (!key) {
+    return formatValue(sectionValue);
+  }
+
+  if (!isRecord(sectionValue)) {
+    return "";
+  }
+
+  return formatValue(sectionValue[key]);
+}
+
+function getFirstString(...values: unknown[]): string {
+  for (const value of values) {
+    const formatted = formatValue(value);
+    if (formatted) return formatted;
+  }
+
+  return "";
+}
+
+function hasFinding(sectionText: string, findingWords: string[]): boolean {
+  const normalized = normalizeForIntent(sectionText);
+  return findingWords.some((word) => normalized.includes(word));
+}
+
+function normal(section: string): string {
+  return `${section}: normal, no se aprecian alteraciones.`;
+}
+
+function absentSign(sign: string): string {
+  return `No, no se aprecia ${sign}.`;
+}
+
 function isSimpleGreeting(message: string): boolean {
   const normalized = normalizeForIntent(message);
 
@@ -61,17 +136,9 @@ function isSimpleGreeting(message: string): boolean {
 function getGreetingReply(message: string): string {
   const normalized = normalizeForIntent(message);
 
-  if (normalized.includes("buenas tardes")) {
-    return "Buenas tardes, doctor.";
-  }
-
-  if (normalized.includes("buenas noches")) {
-    return "Buenas noches, doctor.";
-  }
-
-  if (normalized.includes("como esta")) {
-    return "Pues aquí, doctor.";
-  }
+  if (normalized.includes("buenas tardes")) return "Buenas tardes, doctor.";
+  if (normalized.includes("buenas noches")) return "Buenas noches, doctor.";
+  if (normalized.includes("como esta")) return "Pues aquí, doctor.";
 
   return "Buenos días, doctor.";
 }
@@ -109,221 +176,608 @@ function isChiefComplaintQuestion(message: string): boolean {
   return normalized.length <= 120 && chiefComplaintQuestions.includes(normalized);
 }
 
-function formatValue(value: unknown): string {
-  if (!value) return "";
-
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(formatValue).filter(Boolean).join(", ");
-  }
-
-  if (typeof value === "object") {
-    return Object.entries(value as Record<string, unknown>)
-      .map(([key, item]) => {
-        const formatted = formatValue(item);
-        return formatted ? `${key}: ${formatted}` : "";
-      })
-      .filter(Boolean)
-      .join(". ");
-  }
-
-  return "";
-}
-
-function hasFinding(sectionText: string, findingWords: string[]): boolean {
-  const normalized = normalizeForIntent(sectionText);
-  return findingWords.some((word) => normalized.includes(word));
-}
-
 function getVitalSignsReply(
   normalized: string,
   physicalExam: Record<string, unknown>
 ): string {
-  const vitalSigns = physicalExam.vitalSigns as Record<string, unknown> | undefined;
+  const vitalSigns = getSection(physicalExam, "vitalSigns");
 
   if (!vitalSigns) {
     return "Signos vitales: no disponibles en esta simulación.";
   }
 
   if (normalized.includes("presion") || normalized.includes("tension arterial")) {
-    return `Presión arterial: ${vitalSigns.bloodPressure || "no disponible"}.`;
+    return `Presión arterial: ${formatValue(vitalSigns.bloodPressure) || "no disponible"}.`;
   }
 
   if (normalized.includes("frecuencia cardiaca") || normalized.includes("pulso")) {
-    return `Frecuencia cardíaca: ${vitalSigns.heartRate || "no disponible"}.`;
+    return `Frecuencia cardíaca: ${formatValue(vitalSigns.heartRate) || "no disponible"}.`;
   }
 
   if (normalized.includes("frecuencia respiratoria")) {
-    return `Frecuencia respiratoria: ${vitalSigns.respiratoryRate || "no disponible"}.`;
+    return `Frecuencia respiratoria: ${formatValue(vitalSigns.respiratoryRate) || "no disponible"}.`;
   }
 
   if (normalized.includes("saturacion")) {
-    return `Saturación de oxígeno: ${vitalSigns.oxygenSaturation || "no disponible"}.`;
+    return `Saturación de oxígeno: ${formatValue(vitalSigns.oxygenSaturation) || "no disponible"}.`;
   }
 
   if (normalized.includes("temperatura")) {
-    return `Temperatura: ${vitalSigns.temperature || "no disponible"}.`;
+    return `Temperatura: ${formatValue(vitalSigns.temperature) || "no disponible"}.`;
   }
 
-  return `Signos vitales: presión arterial ${vitalSigns.bloodPressure || "no disponible"}, frecuencia cardíaca ${vitalSigns.heartRate || "no disponible"}, frecuencia respiratoria ${vitalSigns.respiratoryRate || "no disponible"}, saturación ${vitalSigns.oxygenSaturation || "no disponible"} y temperatura ${vitalSigns.temperature || "no disponible"}.`;
+  return `Signos vitales: presión arterial ${formatValue(vitalSigns.bloodPressure) || "no disponible"}, frecuencia cardíaca ${formatValue(vitalSigns.heartRate) || "no disponible"}, frecuencia respiratoria ${formatValue(vitalSigns.respiratoryRate) || "no disponible"}, saturación ${formatValue(vitalSigns.oxygenSaturation) || "no disponible"} y temperatura ${formatValue(vitalSigns.temperature) || "no disponible"}.`;
 }
 
-function getSpecificSignReply(
+function getSpecificCardioReply(
   normalized: string,
   physicalExam: Record<string, unknown>
 ): string | null {
-  const respiratory = formatValue(physicalExam.respiratory);
-  const cardiovascular = formatValue(physicalExam.cardiovascular);
-  const neck = formatValue(physicalExam.neck);
-  const extremities = formatValue(physicalExam.extremities);
-  const neurologic = physicalExam.neurologic as Record<string, unknown> | undefined;
-  const shoulder = physicalExam.shoulder as Record<string, unknown> | undefined;
+  const cardiovascular = getSection(physicalExam, "cardiovascular");
+  const headAndNeck = getSection(physicalExam, "headAndNeck");
+  const neckText = formatValue(physicalExam.neck);
 
-  if (textIncludesAny(normalized, ["onda ascitica", "ascitis"])) {
-    return "No, no se aprecia onda ascítica ni signos de ascitis.";
-  }
+  if (textIncludesAny(normalized, ["ingurgitacion yugular", "yugular", "yugulares", "ingurgitacion"])) {
+    const finding = getFirstString(headAndNeck?.jugularVenousDistension, neckText);
 
-  if (
-    textIncludesAny(normalized, [
-      "murphy",
-      "blumberg",
-      "rebote",
-      "defensa abdominal",
-      "irritacion peritoneal"
-    ])
-  ) {
-    return "No, ese signo no se aprecia en esta exploración.";
-  }
-
-  if (
-    textIncludesAny(normalized, [
-      "masa abdominal",
-      "masas abdominales",
-      "visceromegalia",
-      "hepatomegalia",
-      "esplenomegalia"
-    ])
-  ) {
-    return "No, no se palpan masas ni visceromegalias.";
-  }
-
-  if (textIncludesAny(normalized, ["crepitos", "estertores"])) {
-    if (hasFinding(respiratory, ["crepitos", "estertores"])) {
-      return `Sí. Respiratorio: ${respiratory}`;
-    }
-
-    return "No, no se auscultan crépitos ni estertores.";
-  }
-
-  if (textIncludesAny(normalized, ["sibilancias", "roncus"])) {
-    if (hasFinding(respiratory, ["sibilancias", "roncus"])) {
-      return `Sí. Respiratorio: ${respiratory}`;
-    }
-
-    return "No, no se auscultan sibilancias ni roncus.";
-  }
-
-  if (textIncludesAny(normalized, ["ingurgitacion yugular", "yugular", "yugulares"])) {
-    if (hasFinding(neck, ["ingurgitacion", "yugular"])) {
-      return `Sí. Cuello: ${neck}`;
+    if (hasFinding(finding, ["ingurgitacion", "yugular"])) {
+      return `Sí. Cuello: ${finding}`;
     }
 
     return "No, no se aprecia ingurgitación yugular.";
   }
 
+  if (textIncludesAny(normalized, ["reflujo hepatoyugular", "hepatoyugular"])) {
+    const finding = formatValue(headAndNeck?.hepatojugularReflux);
+
+    if (finding) {
+      return `Reflujo hepatoyugular: ${finding}`;
+    }
+
+    return "Reflujo hepatoyugular: normal, no se aprecia alteración.";
+  }
+
   if (textIncludesAny(normalized, ["s3", "tercer ruido", "galope"])) {
-    if (hasFinding(cardiovascular, ["s3", "tercer ruido", "galope"])) {
-      return `Sí. Cardiovascular: ${cardiovascular}`;
+    const finding = getFirstString(cardiovascular?.heartSounds, formatValue(cardiovascular));
+
+    if (hasFinding(finding, ["s3", "tercer ruido", "galope"])) {
+      return `Sí. Cardiovascular: ${finding}`;
     }
 
     return "No, no se ausculta S3 ni galope.";
   }
 
   if (textIncludesAny(normalized, ["soplo", "soplos"])) {
-    if (hasFinding(cardiovascular, ["soplo", "soplos"])) {
-      return `Sí. Cardiovascular: ${cardiovascular}`;
+    const finding = getFirstString(cardiovascular?.murmurs, formatValue(cardiovascular));
+
+    if (hasFinding(finding, ["soplo"]) && !hasFinding(finding, ["sin soplo", "no se auscultan soplos"])) {
+      return `Sí. Cardiovascular: ${finding}`;
     }
 
     return "No, no se auscultan soplos evidentes.";
   }
 
+  if (textIncludesAny(normalized, ["ritmo", "arritmia", "irregular"])) {
+    const finding = getFirstString(cardiovascular?.rhythm, formatValue(cardiovascular));
+
+    if (finding) {
+      return `Ritmo cardíaco: ${finding}`;
+    }
+
+    return normal("Ritmo cardíaco");
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "punto de maximo impulso",
+      "pmi",
+      "choque de punta",
+      "impulso apical"
+    ])
+  ) {
+    const finding = formatValue(cardiovascular?.palpation);
+
+    if (finding) {
+      return `Palpación precordial: ${finding}`;
+    }
+
+    return "Palpación precordial: normal, no se aprecian alteraciones.";
+  }
+
+  if (textIncludesAny(normalized, ["fremito", "thrill"])) {
+    return "No, no se palpa frémito.";
+  }
+
+  if (textIncludesAny(normalized, ["pulsos", "pulsos perifericos"])) {
+    const finding = getFirstString(
+      cardiovascular?.peripheralPulses,
+      getString(physicalExam, "extremities", "pulses")
+    );
+
+    return finding ? `Pulsos periféricos: ${finding}` : normal("Pulsos periféricos");
+  }
+
+  if (textIncludesAny(normalized, ["llenado capilar"])) {
+    const finding = getFirstString(
+      cardiovascular?.capillaryRefill,
+      getString(physicalExam, "extremities", "capillaryRefill")
+    );
+
+    return finding ? `Llenado capilar: ${finding}` : normal("Llenado capilar");
+  }
+
+  return null;
+}
+
+function getSpecificRespiratoryReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const respiratory = getSection(physicalExam, "respiratory");
+  const respiratoryText = formatValue(respiratory);
+
+  if (textIncludesAny(normalized, ["crepitos", "estertores", "crepitantes"])) {
+    const finding = getFirstString(respiratory?.addedSounds, respiratory?.auscultation, respiratoryText);
+
+    if (hasFinding(finding, ["crepitos", "estertores", "crepitantes"])) {
+      return `Sí. Respiratorio: ${finding}`;
+    }
+
+    return "No, no se auscultan crépitos ni estertores.";
+  }
+
+  if (textIncludesAny(normalized, ["sibilancias", "roncus"])) {
+    const finding = getFirstString(respiratory?.addedSounds, respiratory?.auscultation, respiratoryText);
+
+    if (hasFinding(finding, ["sibilancias", "roncus"])) {
+      return `Sí. Respiratorio: ${finding}`;
+    }
+
+    return "No, no se auscultan sibilancias ni roncus.";
+  }
+
+  if (textIncludesAny(normalized, ["murmullo vesicular"])) {
+    const finding = getFirstString(respiratory?.auscultation, respiratoryText);
+
+    return finding ? `Auscultación pulmonar: ${finding}` : normal("Auscultación pulmonar");
+  }
+
+  return null;
+}
+
+function getSpecificAbdomenReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const abdomen = getSection(physicalExam, "abdomen");
+
+  if (textIncludesAny(normalized, ["onda ascitica", "ascitis", "matidez cambiante"])) {
+    const finding = getFirstString(abdomen?.ascites, abdomen?.percussion);
+
+    if (hasFinding(finding, ["no se aprecia", "sin matidez", "no"])) {
+      return "No, no se aprecia onda ascítica ni signos de ascitis.";
+    }
+
+    return finding ? `Ascitis: ${finding}` : "No, no se aprecia onda ascítica ni signos de ascitis.";
+  }
+
+  if (textIncludesAny(normalized, ["murphy"])) {
+    return "No, no se aprecia signo de Murphy.";
+  }
+
+  if (textIncludesAny(normalized, ["blumberg", "rebote", "defensa abdominal", "irritacion peritoneal"])) {
+    const finding = formatValue(abdomen?.peritonealSigns);
+
+    if (finding) {
+      return `Signos peritoneales: ${finding}`;
+    }
+
+    return "No, no se aprecian signos de irritación peritoneal.";
+  }
+
+  if (textIncludesAny(normalized, ["hepatomegalia", "higado"])) {
+    const finding = getFirstString(abdomen?.hepatomegaly, abdomen?.visceromegaly);
+
+    if (finding) {
+      return `Hígado: ${finding}`;
+    }
+
+    return "No, no se palpa hepatomegalia.";
+  }
+
+  if (textIncludesAny(normalized, ["esplenomegalia", "bazo"])) {
+    const finding = getFirstString(abdomen?.splenomegaly, abdomen?.visceromegaly);
+
+    if (finding) {
+      return `Bazo: ${finding}`;
+    }
+
+    return "No, no se palpa esplenomegalia.";
+  }
+
+  if (textIncludesAny(normalized, ["masa abdominal", "masas abdominales", "visceromegalia", "visceromegalias"])) {
+    const finding = getFirstString(abdomen?.visceromegaly, abdomen?.palpation);
+
+    if (hasFinding(finding, ["sin masas", "no se palpan", "no"])) {
+      return "No, no se palpan masas ni visceromegalias.";
+    }
+
+    return finding ? `Abdomen: ${finding}` : "No, no se palpan masas ni visceromegalias.";
+  }
+
+  return null;
+}
+
+function getSpecificExtremitiesReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const extremities = getSection(physicalExam, "extremities");
+  const extremitiesText = formatValue(extremities);
+
   if (textIncludesAny(normalized, ["edema", "fovea"])) {
-    if (hasFinding(extremities, ["edema", "fovea"])) {
-      return `Sí. Extremidades: ${extremities}`;
+    const finding = getFirstString(extremities?.edema, extremitiesText);
+
+    if (hasFinding(finding, ["edema", "fovea"]) && !hasFinding(finding, ["sin edema", "no se aprecia edema"])) {
+      return `Sí. Extremidades: ${finding}`;
     }
 
     return "No, no se aprecia edema ni fóvea.";
   }
 
+  if (textIncludesAny(normalized, ["homans", "pantorrilla", "dolor pantorrilla"])) {
+    const finding = formatValue(extremities?.calfPain);
+
+    if (finding) {
+      return `Pantorrilla: ${finding}`;
+    }
+
+    return "No hay dolor localizado en pantorrilla.";
+  }
+
+  if (textIncludesAny(normalized, ["asimetria", "asimetria de piernas"])) {
+    const finding = formatValue(extremities?.asymmetry);
+
+    if (finding) {
+      return `Extremidades: ${finding}`;
+    }
+
+    return "No se aprecia asimetría relevante entre extremidades.";
+  }
+
+  return null;
+}
+
+function getSpecificNeurologicReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const neurologic = getSection(physicalExam, "neurologic");
+  const mentalStatus = getSection(physicalExam, "mentalStatus");
+  const headAndNeck = getSection(physicalExam, "headAndNeck");
+
+  if (!neurologic && !mentalStatus && !headAndNeck) {
+    return null;
+  }
+
+  if (textIncludesAny(normalized, ["glasgow", "estado de conciencia", "conciencia", "alerta"])) {
+    const finding = getFirstString(
+      mentalStatus?.consciousness,
+      neurologic?.mentalStatus,
+      getString(physicalExam, "general", "appearance")
+    );
+
+    return finding ? `Estado de conciencia: ${finding}` : normal("Estado de conciencia");
+  }
+
+  if (textIncludesAny(normalized, ["orientacion", "orientado", "persona lugar tiempo"])) {
+    const finding = getFirstString(mentalStatus?.orientation, neurologic?.mentalStatus);
+
+    return finding ? `Orientación: ${finding}` : normal("Orientación");
+  }
+
+  if (textIncludesAny(normalized, ["pupilas", "isocoricas", "reactivas"])) {
+    const finding = getFirstString(headAndNeck?.pupils, neurologic?.cranialNerves);
+
+    return finding ? `Pupilas: ${finding}` : normal("Pupilas");
+  }
+
+  if (textIncludesAny(normalized, ["campos visuales", "vision", "visual"])) {
+    const finding = formatValue(headAndNeck?.visualFields);
+
+    return finding ? `Campos visuales: ${finding}` : normal("Campos visuales");
+  }
+
   if (
     textIncludesAny(normalized, [
+      "pares craneales",
+      "nervios craneales",
+      "cara",
+      "facial",
       "asimetria facial",
-      "desviacion de la boca",
       "boca torcida",
-      "facial"
+      "desviacion de la boca",
+      "comisura"
     ])
   ) {
-    const cranialNerves = formatValue(neurologic?.cranialNerves);
+    const finding = getFirstString(
+      neurologic?.facial,
+      headAndNeck?.facialSymmetry,
+      neurologic?.cranialNerves
+    );
 
-    if (cranialNerves) {
-      return `Sí. Pares craneales/cara: ${cranialNerves}`;
-    }
+    return finding ? `Pares craneales/cara: ${finding}` : normal("Pares craneales/cara");
+  }
 
-    return "No, no se aprecia asimetría facial.";
+  if (textIncludesAny(normalized, ["lenguaje", "habla", "disartria", "afasia"])) {
+    const finding = getFirstString(
+      neurologic?.speech,
+      mentalStatus?.speech,
+      mentalStatus?.comprehension
+    );
+
+    return finding ? `Lenguaje/habla: ${finding}` : normal("Lenguaje/habla");
   }
 
   if (
     textIncludesAny(normalized, [
-      "disartria",
-      "habla rara",
-      "lenguaje alterado",
-      "alteracion del habla"
+      "fuerza brazo derecho",
+      "fuerza del brazo derecho",
+      "miembro superior derecho",
+      "msd"
     ])
   ) {
-    const speech = formatValue(neurologic?.speech);
+    const finding = getFirstString(neurologic?.motorRightArm, neurologic?.motor);
 
-    if (speech) {
-      return `Sí. Lenguaje/habla: ${speech}`;
-    }
-
-    return "No, no se aprecia alteración del habla en esta exploración.";
+    return finding ? `Fuerza brazo derecho: ${finding}` : "Fuerza brazo derecho: 5/5, normal.";
   }
 
-  if (textIncludesAny(normalized, ["jobe"])) {
-    const jobe = formatValue(shoulder?.jobe);
+  if (
+    textIncludesAny(normalized, [
+      "fuerza brazo izquierdo",
+      "fuerza del brazo izquierdo",
+      "miembro superior izquierdo",
+      "msi"
+    ])
+  ) {
+    const finding = getFirstString(neurologic?.motorLeftArm, neurologic?.motor);
 
-    if (jobe) {
-      return `Prueba de Jobe: ${jobe}`;
+    return finding ? `Fuerza brazo izquierdo: ${finding}` : "Fuerza brazo izquierdo: 5/5, normal.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "fuerza pierna derecha",
+      "fuerza de la pierna derecha",
+      "miembro inferior derecho",
+      "mid"
+    ])
+  ) {
+    const finding = getFirstString(neurologic?.motorRightLeg, neurologic?.motor);
+
+    return finding ? `Fuerza pierna derecha: ${finding}` : "Fuerza pierna derecha: 5/5, normal.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "fuerza pierna izquierda",
+      "fuerza de la pierna izquierda",
+      "miembro inferior izquierdo",
+      "mii"
+    ])
+  ) {
+    const finding = getFirstString(neurologic?.motorLeftLeg, neurologic?.motor);
+
+    return finding ? `Fuerza pierna izquierda: ${finding}` : "Fuerza pierna izquierda: 5/5, normal.";
+  }
+
+  if (textIncludesAny(normalized, ["fuerza", "motor", "motricidad"])) {
+    const finding = formatValue(neurologic?.motor);
+
+    return finding ? `Fuerza/motor: ${finding}` : normal("Fuerza/motor");
+  }
+
+  if (textIncludesAny(normalized, ["tono", "espasticidad", "flacidez"])) {
+    const finding = formatValue(neurologic?.tone);
+
+    return finding ? `Tono muscular: ${finding}` : normal("Tono muscular");
+  }
+
+  if (textIncludesAny(normalized, ["reflejos", "osteotendinosos", "rotuliano", "aquiliano", "bicipital", "tricipital"])) {
+    const finding = formatValue(neurologic?.reflexes);
+
+    return finding ? `Reflejos: ${finding}` : normal("Reflejos");
+  }
+
+  if (textIncludesAny(normalized, ["babinski", "respuesta plantar", "plantar"])) {
+    const finding = formatValue(neurologic?.plantarResponse);
+
+    if (finding) {
+      return `Respuesta plantar/Babinski: ${finding}`;
     }
 
-    return "Prueba de Jobe: normal, no se aprecian alteraciones.";
+    return "Respuesta plantar/Babinski: respuesta flexora bilateral, normal.";
+  }
+
+  if (textIncludesAny(normalized, ["sensibilidad", "hipoestesia", "parestesias"])) {
+    const finding = formatValue(neurologic?.sensory);
+
+    return finding ? `Sensibilidad: ${finding}` : normal("Sensibilidad");
+  }
+
+  if (textIncludesAny(normalized, ["coordinacion", "dedo nariz", "talon rodilla"])) {
+    const finding = formatValue(neurologic?.coordination);
+
+    return finding ? `Coordinación: ${finding}` : normal("Coordinación");
+  }
+
+  if (textIncludesAny(normalized, ["marcha", "caminar", "camina"])) {
+    const finding = formatValue(neurologic?.gait);
+
+    return finding ? `Marcha: ${finding}` : normal("Marcha");
+  }
+
+  if (textIncludesAny(normalized, ["pronador", "barré", "barre"])) {
+    const finding = formatValue(neurologic?.pronatorDrift);
+
+    return finding ? `Prueba de pronador: ${finding}` : "Prueba de pronador: normal, no se aprecia desviación.";
+  }
+
+  if (textIncludesAny(normalized, ["rigidez de nuca", "meningeos", "kernig", "brudzinski"])) {
+    const finding = getFirstString(headAndNeck?.meningealSigns, neurologic?.meningealSigns);
+
+    return finding ? `Signos meníngeos: ${finding}` : "Signos meníngeos: negativos.";
+  }
+
+  return null;
+}
+
+function getSpecificShoulderReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const shoulder = getSection(physicalExam, "shoulder");
+  const cervical = getSection(physicalExam, "cervical");
+  const neurovascularUpperLimb = getSection(physicalExam, "neurovascularUpperLimb");
+
+  if (!shoulder && !cervical && !neurovascularUpperLimb) {
+    return null;
+  }
+
+  if (textIncludesAny(normalized, ["jobe", "lata vacia", "empty can"])) {
+    const finding = getFirstString(shoulder?.jobe, shoulder?.emptyCan);
+
+    return finding ? `Prueba de Jobe/lata vacía: ${finding}` : "Prueba de Jobe/lata vacía: normal, no se aprecian alteraciones.";
   }
 
   if (textIncludesAny(normalized, ["neer"])) {
-    const neer = formatValue(shoulder?.neer);
+    const finding = formatValue(shoulder?.neer);
 
-    if (neer) {
-      return `Prueba de Neer: ${neer}`;
-    }
-
-    return "Prueba de Neer: normal, no se aprecian alteraciones.";
+    return finding ? `Prueba de Neer: ${finding}` : "Prueba de Neer: normal, no se aprecian alteraciones.";
   }
 
   if (textIncludesAny(normalized, ["hawkins"])) {
-    const hawkins = formatValue(shoulder?.hawkins);
+    const finding = formatValue(shoulder?.hawkins);
 
-    if (hawkins) {
-      return `Prueba de Hawkins-Kennedy: ${hawkins}`;
-    }
+    return finding ? `Prueba de Hawkins-Kennedy: ${finding}` : "Prueba de Hawkins-Kennedy: normal, no se aprecian alteraciones.";
+  }
 
-    return "Prueba de Hawkins-Kennedy: normal, no se aprecian alteraciones.";
+  if (textIncludesAny(normalized, ["drop arm", "caida del brazo", "brazo caido"])) {
+    const finding = formatValue(shoulder?.dropArm);
+
+    return finding ? `Prueba de caída del brazo: ${finding}` : "Prueba de caída del brazo: negativa.";
+  }
+
+  if (textIncludesAny(normalized, ["rotacion externa", "external rotation"])) {
+    const finding = getFirstString(shoulder?.externalRotation, shoulder?.externalRotationLag);
+
+    return finding ? `Rotación externa: ${finding}` : normal("Rotación externa");
+  }
+
+  if (textIncludesAny(normalized, ["rotacion interna"])) {
+    const finding = getFirstString(shoulder?.internalRotation, shoulder?.liftOff, shoulder?.bellyPress);
+
+    return finding ? `Rotación interna: ${finding}` : normal("Rotación interna");
+  }
+
+  if (textIncludesAny(normalized, ["belly press"])) {
+    const finding = formatValue(shoulder?.bellyPress);
+
+    return finding ? `Belly press: ${finding}` : "Belly press: negativa.";
+  }
+
+  if (textIncludesAny(normalized, ["lift off", "liftoff"])) {
+    const finding = formatValue(shoulder?.liftOff);
+
+    return finding ? `Lift-off: ${finding}` : "Lift-off: normal, no se aprecian alteraciones.";
+  }
+
+  if (textIncludesAny(normalized, ["speed"])) {
+    const finding = formatValue(shoulder?.speed);
+
+    return finding ? `Prueba de Speed: ${finding}` : "Prueba de Speed: negativa.";
+  }
+
+  if (textIncludesAny(normalized, ["yergason"])) {
+    const finding = formatValue(shoulder?.yergason);
+
+    return finding ? `Prueba de Yergason: ${finding}` : "Prueba de Yergason: negativa.";
+  }
+
+  if (textIncludesAny(normalized, ["aprehension", "apprehension"])) {
+    const finding = formatValue(shoulder?.apprehension);
+
+    return finding ? `Prueba de aprehensión: ${finding}` : "Prueba de aprehensión: negativa.";
+  }
+
+  if (textIncludesAny(normalized, ["aduccion cruzada", "cross body", "acromioclavicular"])) {
+    const finding = getFirstString(shoulder?.crossBodyAdduction, shoulder?.acromioclavicularJoint);
+
+    return finding ? `Articulación acromioclavicular: ${finding}` : normal("Articulación acromioclavicular");
+  }
+
+  if (textIncludesAny(normalized, ["corredera bicipital", "bicipital"])) {
+    const finding = formatValue(shoulder?.bicipitalGroove);
+
+    return finding ? `Corredera bicipital: ${finding}` : normal("Corredera bicipital");
+  }
+
+  if (textIncludesAny(normalized, ["arco doloroso", "arco"])) {
+    const finding = formatValue(shoulder?.painfulArc);
+
+    return finding ? `Arco doloroso: ${finding}` : "Arco doloroso: negativo.";
+  }
+
+  if (textIncludesAny(normalized, ["movilidad activa"])) {
+    const finding = formatValue(shoulder?.activeRangeOfMotion);
+
+    return finding ? `Movilidad activa: ${finding}` : normal("Movilidad activa");
+  }
+
+  if (textIncludesAny(normalized, ["movilidad pasiva"])) {
+    const finding = formatValue(shoulder?.passiveRangeOfMotion);
+
+    return finding ? `Movilidad pasiva: ${finding}` : normal("Movilidad pasiva");
+  }
+
+  if (textIncludesAny(normalized, ["movilidad", "abduccion", "elevacion"])) {
+    const finding = getFirstString(shoulder?.activeRangeOfMotion, shoulder?.passiveRangeOfMotion);
+
+    return finding ? `Movilidad del hombro: ${finding}` : normal("Movilidad del hombro");
+  }
+
+  if (textIncludesAny(normalized, ["palpo", "palpacion", "dolor a la palpacion"])) {
+    const finding = formatValue(shoulder?.palpation);
+
+    return finding ? `Palpación del hombro: ${finding}` : normal("Palpación del hombro");
+  }
+
+  if (textIncludesAny(normalized, ["fuerza hombro", "fuerza del hombro", "manguito"])) {
+    const finding = formatValue(shoulder?.strength);
+
+    return finding ? `Fuerza del hombro: ${finding}` : normal("Fuerza del hombro");
+  }
+
+  if (textIncludesAny(normalized, ["spurling", "radicular", "cervical", "cuello"])) {
+    const finding = getFirstString(cervical?.spurling, cervical?.rangeOfMotion, cervical?.painReproduction);
+
+    return finding ? `Columna cervical: ${finding}` : normal("Columna cervical");
+  }
+
+  if (textIncludesAny(normalized, ["neurovascular", "pulso radial", "sensibilidad distal", "mano", "dedos"])) {
+    const finding = formatValue(neurovascularUpperLimb);
+
+    return finding ? `Evaluación neurovascular distal: ${finding}` : normal("Evaluación neurovascular distal");
+  }
+
+  if (textIncludesAny(normalized, ["hombro"])) {
+    const finding = getFirstString(
+      shoulder?.inspection,
+      shoulder?.palpation,
+      shoulder?.activeRangeOfMotion
+    );
+
+    return finding ? `Hombro: ${finding}` : normal("Hombro");
   }
 
   return null;
@@ -335,70 +789,50 @@ function getPhysicalExamReply(
 ): string | null {
   const normalized = normalizeForIntent(message);
 
-  const asksSpecificSign = textIncludesAny(normalized, [
-    "onda ascitica",
-    "ascitis",
-    "murphy",
-    "blumberg",
-    "rebote",
-    "defensa abdominal",
-    "irritacion peritoneal",
-    "masa abdominal",
-    "masas abdominales",
-    "visceromegalia",
-    "hepatomegalia",
-    "esplenomegalia",
-    "crepitos",
-    "estertores",
-    "sibilancias",
-    "roncus",
-    "ingurgitacion yugular",
-    "yugular",
-    "yugulares",
-    "s3",
-    "tercer ruido",
-    "galope",
-    "soplo",
-    "soplos",
-    "edema",
-    "fovea",
-    "asimetria facial",
-    "desviacion de la boca",
-    "boca torcida",
-    "disartria",
-    "habla rara",
-    "lenguaje alterado",
-    "alteracion del habla",
+  const examKeywords = [
+    "examino",
+    "evaluo",
+    "exploro",
+    "reviso",
+    "ausculto",
+    "palpo",
+    "tomo",
+    "realizo",
+    "observo",
+    "inspecciono",
+    "mido",
+    "percuto",
+    "busco",
+    "signo",
+    "maniobra",
+    "reflejos",
+    "babinski",
     "jobe",
     "neer",
-    "hawkins"
-  ]);
+    "hawkins",
+    "drop arm",
+    "belly press",
+    "speed",
+    "yergason",
+    "spurling"
+  ];
 
-  const isExamAction =
-    normalized.includes("examino") ||
-    normalized.includes("evaluo") ||
-    normalized.includes("exploro") ||
-    normalized.includes("reviso") ||
-    normalized.includes("ausculto") ||
-    normalized.includes("palpo") ||
-    normalized.includes("tomo") ||
-    normalized.includes("realizo") ||
-    normalized.includes("observo") ||
-    normalized.includes("inspecciono") ||
-    normalized.includes("mido") ||
-    normalized.includes("percuto") ||
-    normalized.includes("busco") ||
-    normalized.includes("signo") ||
-    normalized.includes("maniobra");
+  const isExamAction = textIncludesAny(normalized, examKeywords);
 
-  if (!isExamAction && !asksSpecificSign) {
+  if (!isExamAction) {
     return null;
   }
 
-  const specificSignReply = getSpecificSignReply(normalized, physicalExam);
+  const specificReply =
+    getSpecificCardioReply(normalized, physicalExam) ||
+    getSpecificRespiratoryReply(normalized, physicalExam) ||
+    getSpecificAbdomenReply(normalized, physicalExam) ||
+    getSpecificExtremitiesReply(normalized, physicalExam) ||
+    getSpecificNeurologicReply(normalized, physicalExam) ||
+    getSpecificShoulderReply(normalized, physicalExam);
 
-  if (specificSignReply) {
-    return specificSignReply;
+  if (specificReply) {
+    return specificReply;
   }
 
   if (
@@ -417,18 +851,9 @@ function getPhysicalExamReply(
     return getVitalSignsReply(normalized, physicalExam);
   }
 
-  if (textIncludesAny(normalized, ["estado general", "general", "inspeccion general"])) {
-    const general = formatValue(physicalExam.general);
-    return general
-      ? `Estado general: ${general}`
-      : "Estado general: normal, no se aprecian alteraciones.";
-  }
-
-  if (textIncludesAny(normalized, ["cuello", "yugular", "yugulares"])) {
-    const neck = formatValue(physicalExam.neck);
-    return neck
-      ? `Cuello: ${neck}`
-      : "Cuello: normal, no se aprecian alteraciones.";
+  if (textIncludesAny(normalized, ["estado general", "general", "aspecto"])) {
+    const finding = getString(physicalExam, "general");
+    return finding ? `Estado general: ${finding}` : normal("Estado general");
   }
 
   if (
@@ -438,10 +863,17 @@ function getPhysicalExamReply(
       "pupilas",
       "boca",
       "orofaringe",
-      "oidos"
+      "oidos",
+      "cabeza y cuello"
     ])
   ) {
-    return "Cabeza y cuello: normal, no se aprecian alteraciones relevantes.";
+    const finding = getString(physicalExam, "headAndNeck");
+    return finding ? `Cabeza y cuello: ${finding}` : normal("Cabeza y cuello");
+  }
+
+  if (textIncludesAny(normalized, ["cuello", "yugular", "yugulares"])) {
+    const finding = getFirstString(getString(physicalExam, "neck"), getString(physicalExam, "headAndNeck"));
+    return finding ? `Cuello: ${finding}` : normal("Cuello");
   }
 
   if (
@@ -449,15 +881,12 @@ function getPhysicalExamReply(
       "corazon",
       "cardiaco",
       "cardiovascular",
-      "ritmo",
-      "soplo",
+      "precordio",
       "ruidos cardiacos"
     ])
   ) {
-    const cardiovascular = formatValue(physicalExam.cardiovascular);
-    return cardiovascular
-      ? `Cardiovascular: ${cardiovascular}`
-      : "Cardiovascular: normal, no se aprecian alteraciones.";
+    const finding = getString(physicalExam, "cardiovascular");
+    return finding ? `Cardiovascular: ${finding}` : normal("Cardiovascular");
   }
 
   if (
@@ -466,14 +895,11 @@ function getPhysicalExamReply(
       "pulmones",
       "respiratorio",
       "campos pulmonares",
-      "torax",
-      "ausculto campo"
+      "torax"
     ])
   ) {
-    const respiratory = formatValue(physicalExam.respiratory);
-    return respiratory
-      ? `Respiratorio: ${respiratory}`
-      : "Respiratorio: normal, no se auscultan ruidos agregados.";
+    const finding = getString(physicalExam, "respiratory");
+    return finding ? `Respiratorio: ${finding}` : normal("Respiratorio");
   }
 
   if (
@@ -488,10 +914,8 @@ function getPhysicalExamReply(
       "ruidos intestinales"
     ])
   ) {
-    const abdomen = formatValue(physicalExam.abdomen);
-    return abdomen
-      ? `Abdomen: ${abdomen}`
-      : "Abdomen: normal, no se aprecian alteraciones.";
+    const finding = getString(physicalExam, "abdomen");
+    return finding ? `Abdomen: ${finding}` : normal("Abdomen");
   }
 
   if (
@@ -499,134 +923,53 @@ function getPhysicalExamReply(
       "extremidades",
       "piernas",
       "tobillos",
-      "edema",
-      "fovea",
-      "pulsos perifericos",
-      "llenado capilar"
+      "miembros inferiores",
+      "miembros superiores"
     ])
   ) {
-    const extremities = formatValue(physicalExam.extremities);
-    return extremities
-      ? `Extremidades: ${extremities}`
-      : "Extremidades: normal, no se aprecian alteraciones.";
-  }
-
-  if (
-    textIncludesAny(normalized, [
-      "hombro",
-      "movilidad",
-      "abduccion",
-      "arco",
-      "jobe",
-      "neer",
-      "hawkins",
-      "rotacion",
-      "manguito"
-    ])
-  ) {
-    const shoulder = physicalExam.shoulder as Record<string, unknown> | undefined;
-
-    if (!shoulder) {
-      return "Hombro: normal, no se aprecian alteraciones.";
-    }
-
-    if (normalized.includes("jobe")) {
-      return `Prueba de Jobe: ${formatValue(shoulder.jobe)}`;
-    }
-
-    if (normalized.includes("neer")) {
-      return `Prueba de Neer: ${formatValue(shoulder.neer)}`;
-    }
-
-    if (normalized.includes("hawkins")) {
-      return `Prueba de Hawkins-Kennedy: ${formatValue(shoulder.hawkins)}`;
-    }
-
-    if (textIncludesAny(normalized, ["palpo", "palpacion"])) {
-      return `Palpación del hombro: ${formatValue(shoulder.palpation)}`;
-    }
-
-    if (normalized.includes("movilidad activa")) {
-      return `Movilidad activa: ${formatValue(shoulder.activeRangeOfMotion)}`;
-    }
-
-    if (normalized.includes("movilidad pasiva")) {
-      return `Movilidad pasiva: ${formatValue(shoulder.passiveRangeOfMotion)}`;
-    }
-
-    if (normalized.includes("arco")) {
-      return `Arco doloroso: ${formatValue(shoulder.painfulArc)}`;
-    }
-
-    if (textIncludesAny(normalized, ["fuerza", "rotacion"])) {
-      return `Fuerza del hombro: ${formatValue(shoulder.strength)}`;
-    }
-
-    return `Hombro: ${formatValue(shoulder.activeRangeOfMotion || shoulder.inspection || shoulder)}`;
+    const finding = getString(physicalExam, "extremities");
+    return finding ? `Extremidades: ${finding}` : normal("Extremidades");
   }
 
   if (
     textIncludesAny(normalized, [
       "neurologico",
+      "neurologica",
+      "sistema nervioso",
       "fuerza",
       "sensibilidad",
       "pares craneales",
-      "cara",
-      "facial",
       "lenguaje",
       "habla",
       "marcha",
       "coordinacion",
-      "dedo nariz",
+      "tono",
       "reflejos"
     ])
   ) {
-    const neurologic = physicalExam.neurologic as Record<string, unknown> | undefined;
-
-    if (!neurologic) {
-      return "Neurológico: normal, no se aprecian alteraciones.";
-    }
-
-    if (textIncludesAny(normalized, ["fuerza", "motor"])) {
-      return `Fuerza/motor: ${formatValue(neurologic.motor)}`;
-    }
-
-    if (normalized.includes("sensibilidad")) {
-      return `Sensibilidad: ${formatValue(neurologic.sensory)}`;
-    }
-
-    if (textIncludesAny(normalized, ["pares", "cara", "facial"])) {
-      return `Pares craneales/cara: ${formatValue(neurologic.cranialNerves)}`;
-    }
-
-    if (textIncludesAny(normalized, ["lenguaje", "habla"])) {
-      return `Lenguaje/habla: ${formatValue(neurologic.speech)}`;
-    }
-
-    if (normalized.includes("marcha")) {
-      return `Marcha: ${formatValue(neurologic.gait)}`;
-    }
-
-    if (textIncludesAny(normalized, ["coordinacion", "dedo nariz"])) {
-      return `Coordinación: ${formatValue(neurologic.coordination)}`;
-    }
-
-    if (normalized.includes("reflejos")) {
-      return "Reflejos: no se aprecian alteraciones relevantes en esta simulación.";
-    }
-
-    return `Neurológico: ${formatValue(neurologic)}`;
+    const finding = getString(physicalExam, "neurologic");
+    return finding ? `Neurológico: ${finding}` : normal("Neurológico");
   }
 
-  if (textIncludesAny(normalized, ["cervical", "columna cervical"])) {
-    const cervical = formatValue(physicalExam.cervical);
-    return cervical
-      ? `Columna cervical: ${cervical}`
-      : "Columna cervical: normal, no se aprecian alteraciones.";
+  if (
+    textIncludesAny(normalized, [
+      "hombro",
+      "musculoesqueletico",
+      "osteomuscular",
+      "articular"
+    ])
+  ) {
+    const finding = getFirstString(
+      getString(physicalExam, "shoulder"),
+      getString(physicalExam, "musculoskeletal")
+    );
+
+    return finding ? `Osteomuscular: ${finding}` : normal("Osteomuscular");
   }
 
   if (textIncludesAny(normalized, ["piel", "mucosas"])) {
-    return "Piel y mucosas: normal, no se aprecian alteraciones.";
+    const finding = getString(physicalExam, "skin");
+    return finding ? `Piel y mucosas: ${finding}` : normal("Piel y mucosas");
   }
 
   return "Exploración física: normal, no se aprecian alteraciones relevantes.";
