@@ -106,6 +106,493 @@ function isChiefComplaintQuestion(message: string): boolean {
   return normalized.length <= 120 && chiefComplaintQuestions.includes(normalized);
 }
 
+function formatValue(value: unknown): string {
+  if (!value) return "";
+
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(formatValue).filter(Boolean).join(", ");
+  }
+
+  if (typeof value === "object") {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([key, item]) => {
+        const formatted = formatValue(item);
+        return formatted ? `${key}: ${formatted}` : "";
+      })
+      .filter(Boolean)
+      .join(". ");
+  }
+
+  return "";
+}
+
+function getVitalSignsReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const vitalSigns = physicalExam.vitalSigns as Record<string, unknown> | undefined;
+
+  if (!vitalSigns) {
+    return "Signos vitales: no disponibles en esta simulación.";
+  }
+
+  if (normalized.includes("presion") || normalized.includes("tension arterial")) {
+    return `Presión arterial: ${vitalSigns.bloodPressure || "no disponible"}.`;
+  }
+
+  if (normalized.includes("frecuencia cardiaca") || normalized.includes("pulso")) {
+    return `Frecuencia cardíaca: ${vitalSigns.heartRate || "no disponible"}.`;
+  }
+
+  if (normalized.includes("frecuencia respiratoria")) {
+    return `Frecuencia respiratoria: ${vitalSigns.respiratoryRate || "no disponible"}.`;
+  }
+
+  if (normalized.includes("saturacion")) {
+    return `Saturación de oxígeno: ${vitalSigns.oxygenSaturation || "no disponible"}.`;
+  }
+
+  if (normalized.includes("temperatura")) {
+    return `Temperatura: ${vitalSigns.temperature || "no disponible"}.`;
+  }
+
+  return `Signos vitales: presión arterial ${vitalSigns.bloodPressure || "no disponible"}, frecuencia cardíaca ${vitalSigns.heartRate || "no disponible"}, frecuencia respiratoria ${vitalSigns.respiratoryRate || "no disponible"}, saturación ${vitalSigns.oxygenSaturation || "no disponible"} y temperatura ${vitalSigns.temperature || "no disponible"}.`;
+}
+
+function textIncludesAny(text: string, words: string[]): boolean {
+  return words.some((word) => text.includes(word));
+}
+
+function hasFinding(sectionText: string, findingWords: string[]): boolean {
+  const normalized = normalizeForIntent(sectionText);
+  return findingWords.some((word) => normalized.includes(word));
+}
+
+function getSpecificSignReply(
+  normalized: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const respiratory = formatValue(physicalExam.respiratory);
+  const cardiovascular = formatValue(physicalExam.cardiovascular);
+  const neck = formatValue(physicalExam.neck);
+  const extremities = formatValue(physicalExam.extremities);
+  const neurologic = physicalExam.neurologic as Record<string, unknown> | undefined;
+  const shoulder = physicalExam.shoulder as Record<string, unknown> | undefined;
+
+  if (textIncludesAny(normalized, ["onda ascitica", "ascitis"])) {
+    return "No, no se aprecia onda ascítica ni signos de ascitis.";
+  }
+
+  if (textIncludesAny(normalized, ["murphy", "blumberg", "rebote", "defensa abdominal", "irritacion peritoneal"])) {
+    return "No, ese signo no se aprecia en esta exploración.";
+  }
+
+  if (textIncludesAny(normalized, ["masa abdominal", "masas abdominales", "visceromegalia", "hepatomegalia", "esplenomegalia"])) {
+    return "No, no se palpan masas ni visceromegalias.";
+  }
+
+  if (textIncludesAny(normalized, ["crepitos", "estertores"])) {
+    if (hasFinding(respiratory, ["crepitos", "estertores"])) {
+      return `Sí. Respiratorio: ${respiratory}`;
+    }
+
+    return "No, no se auscultan crépitos ni estertores.";
+  }
+
+  if (textIncludesAny(normalized, ["sibilancias", "roncus"])) {
+    if (hasFinding(respiratory, ["sibilancias", "roncus"])) {
+      return `Sí. Respiratorio: ${respiratory}`;
+    }
+
+    return "No, no se auscultan sibilancias ni roncus.";
+  }
+
+  if (textIncludesAny(normalized, ["ingurgitacion yugular", "yugular", "yugulares"])) {
+    if (hasFinding(neck, ["ingurgitacion", "yugular"])) {
+      return `Sí. Cuello: ${neck}`;
+    }
+
+    return "No, no se aprecia ingurgitación yugular.";
+  }
+
+  if (textIncludesAny(normalized, ["s3", "tercer ruido", "galope"])) {
+    if (hasFinding(cardiovascular, ["s3", "tercer ruido", "galope"])) {
+      return `Sí. Cardiovascular: ${cardiovascular}`;
+    }
+
+    return "No, no se ausculta S3 ni galope.";
+  }
+
+  if (textIncludesAny(normalized, ["soplo", "soplos"])) {
+    if (hasFinding(cardiovascular, ["soplo", "soplos"])) {
+      return `Sí. Cardiovascular: ${cardiovascular}`;
+    }
+
+    return "No, no se auscultan soplos evidentes.";
+  }
+
+  if (textIncludesAny(normalized, ["edema", "fovea"])) {
+    if (hasFinding(extremities, ["edema", "fovea"])) {
+      return `Sí. Extremidades: ${extremities}`;
+    }
+
+    return "No, no se aprecia edema ni fóvea.";
+  }
+
+  if (textIncludesAny(normalized, ["asimetria facial", "desviacion de la boca", "boca torcida", "facial"])) {
+    const cranialNerves = formatValue(neurologic?.cranialNerves);
+
+    if (cranialNerves) {
+      return `Sí. Pares craneales/cara: ${cranialNerves}`;
+    }
+
+    return "No, no se aprecia asimetría facial.";
+  }
+
+  if (textIncludesAny(normalized, ["disartria", "habla rara", "lenguaje alterado", "alteracion del habla"])) {
+    const speech = formatValue(neurologic?.speech);
+
+    if (speech) {
+      return `Sí. Lenguaje/habla: ${speech}`;
+    }
+
+    return "No, no se aprecia alteración del habla en esta exploración.";
+  }
+
+  if (textIncludesAny(normalized, ["jobe"])) {
+    const jobe = formatValue(shoulder?.jobe);
+
+    if (jobe) {
+      return `Prueba de Jobe: ${jobe}`;
+    }
+
+    return "Prueba de Jobe: normal, no se aprecian alteraciones.";
+  }
+
+  if (textIncludesAny(normalized, ["neer"])) {
+    const neer = formatValue(shoulder?.neer);
+
+    if (neer) {
+      return `Prueba de Neer: ${neer}`;
+    }
+
+    return "Prueba de Neer: normal, no se aprecian alteraciones.";
+  }
+
+  if (textIncludesAny(normalized, ["hawkins"])) {
+    const hawkins = formatValue(shoulder?.hawkins);
+
+    if (hawkins) {
+      return `Prueba de Hawkins-Kennedy: ${hawkins}`;
+    }
+
+    return "Prueba de Hawkins-Kennedy: normal, no se aprecian alteraciones.";
+  }
+
+  return null;
+}
+
+function getPhysicalExamReply(
+  message: string,
+  physicalExam: Record<string, unknown>
+): string | null {
+  const normalized = normalizeForIntent(message);
+
+  const asksSpecificSign = textIncludesAny(normalized, [
+    "onda ascitica",
+    "ascitis",
+    "murphy",
+    "blumberg",
+    "rebote",
+    "defensa abdominal",
+    "irritacion peritoneal",
+    "masa abdominal",
+    "masas abdominales",
+    "visceromegalia",
+    "hepatomegalia",
+    "esplenomegalia",
+    "crepitos",
+    "estertores",
+    "sibilancias",
+    "roncus",
+    "ingurgitacion yugular",
+    "yugular",
+    "yugulares",
+    "s3",
+    "tercer ruido",
+    "galope",
+    "soplo",
+    "soplos",
+    "edema",
+    "fovea",
+    "asimetria facial",
+    "desviacion de la boca",
+    "boca torcida",
+    "disartria",
+    "habla rara",
+    "lenguaje alterado",
+    "alteracion del habla",
+    "jobe",
+    "neer",
+    "hawkins"
+  ]);
+
+  const isExamAction =
+    normalized.includes("examino") ||
+    normalized.includes("evaluo") ||
+    normalized.includes("exploro") ||
+    normalized.includes("reviso") ||
+    normalized.includes("ausculto") ||
+    normalized.includes("palpo") ||
+    normalized.includes("tomo") ||
+    normalized.includes("realizo") ||
+    normalized.includes("observo") ||
+    normalized.includes("inspecciono") ||
+    normalized.includes("mido") ||
+    normalized.includes("percuto") ||
+    normalized.includes("busco") ||
+    normalized.includes("signo") ||
+    normalized.includes("maniobra");
+
+  if (!isExamAction && !asksSpecificSign) {
+    return null;
+  }
+
+  const specificSignReply = getSpecificSignReply(normalized, physicalExam);
+
+  if (specificSignReply) {
+    return specificSignReply;
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "signos vitales",
+      "vitales",
+      "presion",
+      "tension arterial",
+      "frecuencia cardiaca",
+      "pulso",
+      "frecuencia respiratoria",
+      "saturacion",
+      "temperatura"
+    ])
+  ) {
+    return getVitalSignsReply(normalized, physicalExam);
+  }
+
+  if (textIncludesAny(normalized, ["estado general", "general", "inspeccion general"])) {
+    const general = formatValue(physicalExam.general);
+    return general
+      ? `Estado general: ${general}`
+      : "Estado general: normal, no se aprecian alteraciones.";
+  }
+
+  if (textIncludesAny(normalized, ["cabeza", "ojos", "pupilas", "boca", "orofaringe", "oidos"])) {
+    return "Cabeza y cuello: normal, no se aprecian alteraciones relevantes.";
+  }
+
+  if (textIncludesAny(normalized, ["cuello", "yugular", "yugulares"])) {
+    const neck = formatValue(physicalExam.neck);
+    return neck
+      ? `Cuello: ${neck}`
+      : "Cuello: normal, no se aprecian alteraciones.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "corazon",
+      "cardiaco",
+      "cardiovascular",
+      "ritmo",
+      "soplo",
+      "ruidos cardiacos"
+    ])
+  ) {
+    const cardiovascular = formatValue(physicalExam.cardiovascular);
+    return cardiovascular
+      ? `Cardiovascular: ${cardiovascular}`
+      : "Cardiovascular: normal, no se aprecian alteraciones.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "pulmon",
+      "pulmones",
+      "respiratorio",
+      "campos pulmonares",
+      "torax",
+      "ausculto campo"
+    ])
+  ) {
+    const respiratory = formatValue(physicalExam.respiratory);
+    return respiratory
+      ? `Respiratorio: ${respiratory}`
+      : "Respiratorio: normal, no se auscultan ruidos agregados.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "abdomen",
+      "abdominal",
+      "epigastrio",
+      "hipocondrio",
+      "fosa iliaca",
+      "peristaltismo",
+      "ruidos intestinales"
+    ])
+  ) {
+    const abdomen = formatValue(physicalExam.abdomen);
+    return abdomen
+      ? `Abdomen: ${abdomen}`
+      : "Abdomen: normal, no se aprecian alteraciones.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "extremidades",
+      "piernas",
+      "tobillos",
+      "edema",
+      "fovea",
+      "pulsos perifericos",
+      "llenado capilar"
+    ])
+  ) {
+    const extremities = formatValue(physicalExam.extremities);
+    return extremities
+      ? `Extremidades: ${extremities}`
+      : "Extremidades: normal, no se aprecian alteraciones.";
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "neurologico",
+      "fuerza",
+      "sensibilidad",
+      "pares craneales",
+      "cara",
+      "facial",
+      "lenguaje",
+      "habla",
+      "marcha",
+      "coordinacion",
+      "dedo nariz",
+      "reflejos"
+    ])
+  ) {
+    const neurologic = physicalExam.neurologic as Record<string, unknown> | undefined;
+
+    if (!neurologic) {
+      return "Neurológico: normal, no se aprecian alteraciones.";
+    }
+
+    if (textIncludesAny(normalized, ["fuerza", "motor"])) {
+      return `Fuerza/motor: ${formatValue(neurologic.motor)}`;
+    }
+
+    if (normalized.includes("sensibilidad")) {
+      return `Sensibilidad: ${formatValue(neurologic.sensory)}`;
+    }
+
+    if (textIncludesAny(normalized, ["pares", "cara", "facial"])) {
+      return `Pares craneales/cara: ${formatValue(neurologic.cranialNerves)}`;
+    }
+
+    if (textIncludesAny(normalized, ["lenguaje", "habla"])) {
+      return `Lenguaje/habla: ${formatValue(neurologic.speech)}`;
+    }
+
+    if (normalized.includes("marcha")) {
+      return `Marcha: ${formatValue(neurologic.gait)}`;
+    }
+
+    if (textIncludesAny(normalized, ["coordinacion", "dedo nariz"])) {
+      return `Coordinación: ${formatValue(neurologic.coordination)}`;
+    }
+
+    if (normalized.includes("reflejos")) {
+      return "Reflejos: no se aprecian alteraciones relevantes en esta simulación.";
+    }
+
+    return `Neurológico: ${formatValue(neurologic)}`;
+  }
+
+  if (
+    textIncludesAny(normalized, [
+      "hombro",
+      "movilidad",
+      "abduccion",
+      "arco",
+      "jobe",
+      "neer",
+      "hawkins",
+      "rotacion",
+      "manguito"
+    ])
+  ) {
+    const shoulder = physicalExam.shoulder as Record<string, unknown> | undefined;
+
+    if (!shoulder) {
+      return "Hombro: normal, no se aprecian alteraciones.";
+    }
+
+    if (normalized.includes("jobe")) {
+      return `Prueba de Jobe: ${formatValue(shoulder.jobe)}`;
+    }
+
+    if (normalized.includes("neer")) {
+      return `Prueba de Neer: ${formatValue(shoulder.neer)}`;
+    }
+
+    if (normalized.includes("hawkins")) {
+      return `Prueba de Hawkins-Kennedy: ${formatValue(shoulder.hawkins)}`;
+    }
+
+    if (textIncludesAny(normalized, ["palpo", "palpacion"])) {
+      return `Palpación del hombro: ${formatValue(shoulder.palpation)}`;
+    }
+
+    if (normalized.includes("movilidad activa")) {
+      return `Movilidad activa: ${formatValue(shoulder.activeRangeOfMotion)}`;
+    }
+
+    if (normalized.includes("movilidad pasiva")) {
+      return `Movilidad pasiva: ${formatValue(shoulder.passiveRangeOfMotion)}`;
+    }
+
+    if (normalized.includes("arco")) {
+      return `Arco doloroso: ${formatValue(shoulder.painfulArc)}`;
+    }
+
+    if (textIncludesAny(normalized, ["fuerza", "rotacion"])) {
+      return `Fuerza del hombro: ${formatValue(shoulder.strength)}`;
+    }
+
+    return `Hombro: ${formatValue(shoulder.activeRangeOfMotion || shoulder.inspection || shoulder)}`;
+  }
+
+  if (textIncludesAny(normalized, ["cervical", "columna cervical"])) {
+    const cervical = formatValue(physicalExam.cervical);
+    return cervical
+      ? `Columna cervical: ${cervical}`
+      : "Columna cervical: normal, no se aprecian alteraciones.";
+  }
+
+  if (textIncludesAny(normalized, ["piel", "mucosas"])) {
+    return "Piel y mucosas: normal, no se aprecian alteraciones.";
+  }
+
+  return "Exploración física: normal, no se aprecian alteraciones relevantes.";
+}
+
 export async function POST(request: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -164,11 +651,6 @@ export async function POST(request: Request) {
       });
     }
 
-    /*
-      Regla dura:
-      Si el estudiante solo saluda, la app responde directamente
-      sin llamar al modelo. Así evitamos que el paciente revele datos clínicos.
-    */
     if (isSimpleGreeting(studentMessage)) {
       return NextResponse.json({
         ok: true,
@@ -176,13 +658,6 @@ export async function POST(request: Request) {
       });
     }
 
-    /*
-      Regla dura:
-      Si el estudiante pregunta de forma abierta por el motivo de consulta,
-      la app responde únicamente el motivo principal del caso seleccionado.
-      Esto evita que la IA entregue duración, síntomas asociados,
-      antecedentes o hallazgos antes de que el estudiante los indague.
-    */
     if (isChiefComplaintQuestion(studentMessage)) {
       return NextResponse.json({
         ok: true,
@@ -203,6 +678,18 @@ export async function POST(request: Request) {
         ok: true,
         reply:
           "Ay doctor, fueron muchas preguntas al tiempo y me confundí. ¿Me las puede hacer más despacio, de a poquitas?"
+      });
+    }
+
+    const physicalExamReply = getPhysicalExamReply(
+      studentMessage,
+      selectedCase.physicalExam
+    );
+
+    if (physicalExamReply) {
+      return NextResponse.json({
+        ok: true,
+        reply: physicalExamReply
       });
     }
 
