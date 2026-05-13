@@ -101,10 +101,6 @@ function normal(section: string): string {
   return `${section}: normal, no se aprecian alteraciones.`;
 }
 
-function absentSign(sign: string): string {
-  return `No, no se aprecia ${sign}.`;
-}
-
 function isSimpleGreeting(message: string): boolean {
   const normalized = normalizeForIntent(message);
 
@@ -141,6 +137,24 @@ function getGreetingReply(message: string): string {
   if (normalized.includes("como esta")) return "Pues aquí, doctor.";
 
   return "Buenos días, doctor.";
+}
+
+function getTopicGuideReply(
+  message: string,
+  selectedCase: { responseGuide?: { topicAnswers?: Record<string, string> } }
+): string | null {
+  const normalizedMessage = normalizeForIntent(message);
+  const topicAnswers = selectedCase.responseGuide?.topicAnswers || {};
+
+  for (const [topic, answer] of Object.entries(topicAnswers)) {
+    const normalizedTopic = normalizeForIntent(topic);
+
+    if (normalizedTopic && normalizedMessage.includes(normalizedTopic)) {
+      return answer;
+    }
+  }
+
+  return null;
 }
 
 function isChiefComplaintQuestion(message: string): boolean {
@@ -978,13 +992,11 @@ function getPhysicalExamReply(
 export async function POST(request: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Falta configurar OPENAI_API_KEY en el servidor."
-        },
-        { status: 500 }
-      );
+      return NextResponse.json({
+        ok: true,
+        reply:
+          "Doctor, en este momento el sistema no está disponible. Por favor informe al docente."
+      });
     }
 
     const body = await request.json();
@@ -1063,6 +1075,15 @@ export async function POST(request: Request) {
       });
     }
 
+    const topicGuideReply = getTopicGuideReply(studentMessage, selectedCase);
+
+    if (topicGuideReply) {
+      return NextResponse.json({
+        ok: true,
+        reply: topicGuideReply
+      });
+    }
+
     const client = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
     });
@@ -1083,7 +1104,7 @@ export async function POST(request: Request) {
     const response = await client.responses.create({
       model,
       input: prompt,
-      max_output_tokens: 180
+      max_output_tokens: 90
     });
 
     const reply =
@@ -1097,14 +1118,18 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("ERROR OPENAI CHAT:", error);
 
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error?.message || "No se pudo generar la respuesta.",
-        code: error?.code || null,
-        status: error?.status || null
-      },
-      { status: 500 }
-    );
+    if (error?.status === 429 || error?.code === "rate_limit_exceeded") {
+      return NextResponse.json({
+        ok: true,
+        reply:
+          "Doctor, deme un momentico porfa. El sistema está congestionado. Intente enviarme la pregunta otra vez en unos segundos."
+      });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      reply:
+        "Doctor, no entendí bien en este momento. ¿Me puede repetir la pregunta de forma más sencilla?"
+    });
   }
 }
