@@ -1,9 +1,4 @@
-import { CASES, type CaseData } from "./cases";
-import type { Message } from "./validators";
-import { formatTranscript } from "./validators";
-
-type ExtraPatientContext = {
-  identification: Record<string, string | number>;
+type ClinicalPatientInfo = {
   presentIllness: string;
   history: {
     pathological: string[];
@@ -17,7 +12,18 @@ type ExtraPatientContext = {
     occupational: string[];
     epidemiological: string[];
   };
-  reviewOfSystems: Record<string, string>;
+  reviewOfSystems: {
+    general: string;
+    cardiovascular: string;
+    respiratory: string;
+    gastrointestinal: string;
+    genitourinary: string;
+    neurologic: string;
+    musculoskeletal: string;
+    skin: string;
+    endocrine: string;
+    psychiatric: string;
+  };
   results: {
     labs: string[];
     imaging: string[];
@@ -25,34 +31,8 @@ type ExtraPatientContext = {
   };
 };
 
-const EXTRA_PATIENT_CONTEXT: Record<string, ExtraPatientContext> = {
+const CLINICAL_PATIENT_INFO: Record<string, ClinicalPatientInfo> = {
   "case-1": {
-    identification: {
-      fullName: "Gloria Cecilia Restrepo Álvarez",
-      documentId: "43.568.291",
-      bloodTypeRh: "O positivo (O+)",
-      age: 68,
-      sex: "Femenino",
-      genderIdentity: "Mujer cisgénero",
-      ethnicity: "Se autorreconoce como mestiza",
-      birthDate: "1958-02-14",
-      phone: "300 000 0001",
-      address: "Envigado, Antioquia",
-      socioeconomicStratum: "Estrato 3",
-      educationLevel: "Bachillerato completo",
-      residenceArea: "Residencia urbana",
-      insurance: "EPS simulada Sura",
-      maritalStatus: "Viuda",
-      occupation: "Ama de casa",
-      placeOfBirth: "Medellín, Antioquia",
-      emergencyContact: "Hija: Carolina Restrepo, 300 000 0101",
-      dominantHand: "Diestra",
-      mainLanguage: "Español",
-      disability: "No refiere discapacidad conocida",
-      companion: "Consulta sola, aunque su hija está pendiente de ella",
-      informantReliability:
-        "Información confiable, aunque no recuerda con precisión algunos nombres de medicamentos"
-    },
     presentIllness:
       "La dificultad para respirar empezó hace aproximadamente un año y ha empeorado progresivamente. Al principio aparecía con esfuerzos moderados, pero ahora aparece al caminar rápido, subir escaleras o hacer oficios de la casa. Empeora al acostarse completamente, se despierta a veces ahogada en la madrugada, tiene tos seca nocturna y se le hinchan ambos tobillos, sobre todo en la noche. Niega fiebre, dolor en el pecho actual, sangre al toser, desmayos o inicio súbito.",
     history: {
@@ -144,33 +124,8 @@ const EXTRA_PATIENT_CONTEXT: Record<string, ExtraPatientContext> = {
       ]
     }
   },
+
   "case-2": {
-    identification: {
-      fullName: "Álvaro Hernán Gómez Ramírez",
-      documentId: "70.123.456",
-      bloodTypeRh: "A positivo (A+)",
-      age: 72,
-      sex: "Masculino",
-      genderIdentity: "Hombre cisgénero",
-      ethnicity: "Se autorreconoce como mestizo",
-      birthDate: "1954-04-10",
-      phone: "300 000 0002",
-      address: "Medellín, Antioquia",
-      socioeconomicStratum: "Estrato 3",
-      educationLevel: "Bachillerato incompleto",
-      residenceArea: "Residencia urbana",
-      insurance: "Nueva EPS simulada",
-      maritalStatus: "Casado",
-      occupation: "Jubilado",
-      placeOfBirth: "Medellín, Antioquia",
-      emergencyContact: "Esposa: Marta Ramírez, 300 000 0102",
-      dominantHand: "Diestro",
-      mainLanguage: "Español",
-      disability: "No refiere discapacidad previa conocida",
-      companion: "Acude acompañado por su esposa",
-      informantReliability:
-        "Información parcialmente confiable; la esposa complementa por la dificultad del habla"
-    },
     presentIllness:
       "El cuadro empezó de forma súbita hace aproximadamente dos horas. El paciente estaba previamente normal y presentó debilidad del lado derecho, principalmente en brazo y cara, habla enredada, sensación de adormecimiento en cara y brazo derechos, y asimetría facial. Niega trauma, pérdida de conciencia, convulsiones, fiebre, dolor torácico o dolor de cabeza intenso tipo trueno.",
     history: {
@@ -251,32 +206,8 @@ const EXTRA_PATIENT_CONTEXT: Record<string, ExtraPatientContext> = {
       ]
     }
   },
+
   "case-3": {
-    identification: {
-      fullName: "Marcela Andrea Ruiz Castaño",
-      documentId: "43.890.127",
-      bloodTypeRh: "B positivo (B+)",
-      age: 49,
-      sex: "Femenino",
-      genderIdentity: "Mujer cisgénero",
-      ethnicity: "Se autorreconoce como mestiza",
-      birthDate: "1977-09-02",
-      phone: "300 000 0003",
-      address: "Medellín, Antioquia",
-      socioeconomicStratum: "Estrato 3",
-      educationLevel: "Técnico laboral",
-      residenceArea: "Residencia urbana",
-      insurance: "EPS simulada Sanitas",
-      maritalStatus: "Unión libre",
-      occupation: "Auxiliar administrativa",
-      placeOfBirth: "Itagüí, Antioquia",
-      emergencyContact: "Pareja: Andrés Castaño, 300 000 0103",
-      dominantHand: "Diestra",
-      mainLanguage: "Español",
-      disability: "No refiere discapacidad conocida",
-      companion: "Consulta sola",
-      informantReliability: "Información confiable"
-    },
     presentIllness:
       "El dolor de hombro derecho empezó hace aproximadamente tres meses, de forma progresiva. Se localiza principalmente en la cara lateral del hombro. Empeora al levantar el brazo por encima de la cabeza, peinarse, vestirse, cargar bolsas y dormir sobre ese lado. Refiere sensación de debilidad por dolor. Niega trauma fuerte, fiebre, pérdida de peso, deformidad, dolor torácico, hormigueo, adormecimiento o pérdida de fuerza distal en la mano.",
     history: {
@@ -362,163 +293,248 @@ const EXTRA_PATIENT_CONTEXT: Record<string, ExtraPatientContext> = {
   }
 };
 
-function getExtraPatientContext(selectedCase: CaseData): ExtraPatientContext | null {
-  return EXTRA_PATIENT_CONTEXT[selectedCase.id] || null;
+function normalizeClinicalText(value: string): string {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[¿?¡!.,;:]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function compactPatientCase(selectedCase: CaseData) {
-  return {
-    id: selectedCase.id,
-    objetivoOculto: selectedCase.hiddenAcademicObjective,
-    persona: selectedCase.simulatedPerson,
-    datosAmpliadosPaciente: getExtraPatientContext(selectedCase),
-    conducta: selectedCase.conversationBehavior,
-    motivoPrincipal: selectedCase.mainComplaint,
-    negativosImportantes: selectedCase.importantNegatives,
-    guiaDeRespuesta: selectedCase.responseGuide,
-    historiaOculta: selectedCase.hiddenHistory,
-    examenFisico: selectedCase.physicalExam
-  };
+function includesAny(text: string, words: string[]): boolean {
+  return words.some((word) => text.includes(normalizeClinicalText(word)));
 }
 
-function compactEvaluationCase(selectedCase: CaseData) {
-  return {
-    id: selectedCase.id,
-    objetivoEsperado: selectedCase.hiddenAcademicObjective,
-    datosAmpliadosPaciente: getExtraPatientContext(selectedCase),
-    motivoPrincipal: selectedCase.mainComplaint,
-    datosEsperados: {
-      historia: selectedCase.hiddenHistory,
-      examenFisico: selectedCase.physicalExam,
-      negativosImportantes: selectedCase.importantNegatives
-    },
-    listaDeChequeo: selectedCase.evaluationChecklist
-  };
+function list(items: string[]): string {
+  return items.length > 0 ? items.join(". ") + "." : "No refiere.";
 }
 
-function compactTranscript(messages: Message[], limit = 12): string {
-  return formatTranscript(messages.slice(-limit));
-}
+export function getClinicalPatientReply(message: string, caseId: string): string | null {
+  const text = normalizeClinicalText(message);
+  const data = CLINICAL_PATIENT_INFO[caseId];
 
-export function buildPatientPrompt(
-  messages: Message[],
-  selectedCase: CaseData = CASES[0]
-): string {
-  const transcript = compactTranscript(messages, 12);
+  if (!data) return null;
 
-  return `
-Eres una persona simulada dentro de una actividad académica universitaria de semiología básica.
+  if (
+    includesAny(text, [
+      "enfermedad actual",
+      "historia de la enfermedad",
+      "problema actual",
+      "descripcion cronologica",
+      "descripcion detallada",
+      "cronologia"
+    ])
+  ) {
+    return `Enfermedad actual: ${data.presentIllness}`;
+  }
 
-CONTEXTO:
-Esta es una simulación ficticia para que estudiantes de medicina practiquen entrevista clínica, comunicación, historia clínica y observación dirigida.
+  if (includesAny(text, ["antecedentes patologicos", "patologicos"])) {
+    return `Antecedentes personales patológicos: ${list(data.history.pathological)}`;
+  }
 
-ROL:
-- Responde SIEMPRE como la persona simulada.
-- No respondas como sistema, profesor, médico ni evaluador.
-- No expliques reglas internas.
-- No digas diagnósticos.
-- No reveles el objetivo académico oculto.
-- No hables como historia clínica, ficha, formulario ni lista técnica.
+  if (includesAny(text, ["antecedentes quirurgicos", "quirurgicos", "cirugias"])) {
+    return `Antecedentes quirúrgicos: ${list(data.history.surgical)}`;
+  }
 
-NATURALIDAD:
-- Debes sonar como un paciente real.
-- Usa lenguaje cotidiano colombiano.
-- Si el estudiante pregunta de forma simple, responde de forma simple.
-- Si pregunta "enfermedades", "patologías" o "antecedentes", entiende que está preguntando por enfermedades previas.
-- Si pregunta "hipertensión o diabetes", responde directamente si las tienes o no.
-- Si pregunta algo administrativo como RH, documento, teléfono, EPS, dirección, educación, etnia, sexo, género o estrato, responde naturalmente, como paciente.
-- No respondas con encabezados tipo "Revisión endocrina:" salvo que el estudiante pida explícitamente "revisión por sistemas".
-- No digas frases robóticas.
-- Evita respuestas excesivamente cortantes.
-- Puedes decir "que yo sepa", "creo", "me dijeron", "eso aparece en el carné", si encaja con el caso.
-- Si no entiendes un tecnicismo, pregunta qué significa.
+  if (includesAny(text, ["antecedentes traumaticos", "traumaticos", "traumas"])) {
+    return `Antecedentes traumáticos: ${list(data.history.traumatic)}`;
+  }
 
-MANEJO DE INFORMACIÓN:
-- Usa los datos del caso para responder.
-- Puedes completar datos sociales o administrativos menores de forma ficticia y coherente si no están explícitos.
-- NO inventes síntomas, antecedentes médicos importantes, medicamentos, cirugías, alergias ni hallazgos físicos que contradigan el caso.
-- La información clínica debe entregarse progresivamente, según lo que el estudiante pregunte.
-- No entregues todo de una vez.
-- Si el estudiante pregunta por muchas cosas al tiempo, responde solo lo más importante y pide que vaya por partes.
+  if (
+    includesAny(text, [
+      "antecedentes farmacologicos",
+      "farmacologicos",
+      "medicamentos actuales",
+      "que medicamentos toma",
+      "medicamentos"
+    ])
+  ) {
+    return `Antecedentes farmacológicos: ${list(data.history.pharmacological)}`;
+  }
 
-EXAMEN FÍSICO:
-- Si el estudiante dice que realiza una maniobra o explora un sistema, puedes responder el hallazgo del examen físico de forma breve.
-- En ese caso no actúes como médica, pero sí puedes decir el resultado observado de la simulación.
-- Ejemplo: "Al revisar el hombro, me duele cuando levanto el brazo más arriba del hombro."
-- Ejemplo: "Cuando me ausculta, se escuchan ruiditos abajo en los pulmones."
-- Si no hay alteración en un sistema, di de forma natural que no se ve nada raro o que le dijeron que salió normal.
+  if (includesAny(text, ["alergias", "alergicos", "antecedentes alergicos"])) {
+    return `Antecedentes alérgicos: ${list(data.history.allergies)}`;
+  }
 
-ESTILO:
-- Responde en máximo 2 frases cortas, salvo que el estudiante pida una explicación más amplia.
-- No uses viñetas.
-- No uses lenguaje técnico si el paciente no lo usaría.
-- Si estás asustada, cansada, confundida o preocupada, puedes mostrarlo de forma natural.
+  if (
+    includesAny(text, [
+      "toxicos",
+      "toxicologicos",
+      "tabaco",
+      "cigarrillo",
+      "alcohol",
+      "sustancias",
+      "drogas"
+    ])
+  ) {
+    return `Antecedentes toxicológicos: ${list(data.history.toxicological)}`;
+  }
 
-CASO COMPLETO:
-${JSON.stringify(compactPatientCase(selectedCase), null, 2)}
+  if (
+    includesAny(text, [
+      "gineco",
+      "obstetricos",
+      "ginecoobstetricos",
+      "menarquia",
+      "menopausia",
+      "gestas",
+      "embarazos",
+      "partos"
+    ])
+  ) {
+    return `Antecedentes gineco-obstétricos: ${list(
+      data.history.gynecoObstetric || ["No aplica o no refiere datos relevantes"]
+    )}`;
+  }
 
-CONVERSACIÓN RECIENTE:
-${transcript || "Aún no hay conversación."}
+  if (includesAny(text, ["familiares", "antecedentes familiares"])) {
+    return `Antecedentes familiares: ${list(data.history.family)}`;
+  }
 
-Responde ahora SOLO como la persona simulada.
-`.trim();
-}
+  if (
+    includesAny(text, [
+      "ocupacionales",
+      "antecedentes ocupacionales",
+      "ocupacion",
+      "trabajo",
+      "laboral"
+    ])
+  ) {
+    return `Antecedentes ocupacionales: ${list(data.history.occupational)}`;
+  }
 
-export function buildEvaluationPrompt(
-  messages: Message[],
-  diagnosticImpression: string,
-  studentName: string,
-  selectedCase: CaseData = CASES[0]
-): string {
-  const transcript = compactTranscript(messages, 40);
+  if (
+    includesAny(text, [
+      "epidemiologicos",
+      "viajes",
+      "contactos",
+      "exposicion",
+      "epidemiologia"
+    ])
+  ) {
+    return `Antecedentes epidemiológicos: ${list(data.history.epidemiological)}`;
+  }
 
-  return `
-Eres un evaluador académico universitario de semiología básica.
-Evalúas una simulación ficticia, no atención médica real.
+  if (includesAny(text, ["antecedentes"])) {
+    return `Antecedentes: patológicos: ${list(data.history.pathological)} Quirúrgicos: ${list(
+      data.history.surgical
+    )} Traumáticos: ${list(data.history.traumatic)} Farmacológicos: ${list(
+      data.history.pharmacological
+    )} Alérgicos: ${list(data.history.allergies)}`;
+  }
 
-ESTUDIANTE:
-${studentName || "No informado"}
+  if (includesAny(text, ["revision por sistemas", "revision de sistemas"])) {
+    return "¿Qué sistema desea revisar: general, cardiovascular, respiratorio, gastrointestinal, genitourinario, neurológico, osteomuscular, piel, endocrino o psiquiátrico?";
+  }
 
-CASO EVALUADO:
-${JSON.stringify(compactEvaluationCase(selectedCase), null, 2)}
+  if (includesAny(text, ["sistema general", "revision general", "general"])) {
+    return `Revisión general: ${data.reviewOfSystems.general}`;
+  }
 
-TRANSCRIPCIÓN:
-${transcript}
+  if (includesAny(text, ["cardiovascular", "cardiaco", "corazon"])) {
+    return `Revisión cardiovascular: ${data.reviewOfSystems.cardiovascular}`;
+  }
 
-IMPRESIÓN FINAL DEL ESTUDIANTE:
-${diagnosticImpression}
+  if (includesAny(text, ["respiratorio", "pulmonar", "pulmones"])) {
+    return `Revisión respiratoria: ${data.reviewOfSystems.respiratory}`;
+  }
 
-Evalúa con criterio docente para estudiantes de 3er semestre.
-Sé justo: premia comunicación, orden, preguntas relevantes, examen físico dirigido y razonamiento clínico inicial.
+  if (includesAny(text, ["gastrointestinal", "digestivo", "abdominal"])) {
+    return `Revisión gastrointestinal: ${data.reviewOfSystems.gastrointestinal}`;
+  }
 
-Entrega el resultado en español con este formato:
+  if (includesAny(text, ["genitourinario", "urinario", "orina"])) {
+    return `Revisión genitourinaria: ${data.reviewOfSystems.genitourinary}`;
+  }
 
-# Evaluación académica
+  if (includesAny(text, ["neurologico", "neurologica", "nervioso"])) {
+    return `Revisión neurológica: ${data.reviewOfSystems.neurologic}`;
+  }
 
-## Calificación global
-Puntaje: X/100
+  if (
+    includesAny(text, [
+      "osteomuscular",
+      "musculoesqueletico",
+      "musculo esqueletico",
+      "articular"
+    ])
+  ) {
+    return `Revisión osteomuscular: ${data.reviewOfSystems.musculoskeletal}`;
+  }
 
-## Rúbrica
-- Organización de la entrevista: X/10
-- Secuencia lógica: X/10
-- Profundidad del interrogatorio: X/15
-- Preguntas clave del caso: X/20
-- Comunicación y empatía: X/15
-- Lenguaje claro/no técnico: X/10
-- Observación dirigida/examen físico: X/10
-- Impresión final: X/10
+  if (includesAny(text, ["piel", "dermatologico"])) {
+    return `Revisión de piel: ${data.reviewOfSystems.skin}`;
+  }
 
-## Fortalezas
+  if (includesAny(text, ["endocrino", "diabetes", "tiroides"])) {
+    return `Revisión endocrina: ${data.reviewOfSystems.endocrine}`;
+  }
 
-## Aspectos omitidos o incompletos
+  if (includesAny(text, ["psiquiatrico", "ansiedad", "animo", "estado de animo"])) {
+    return `Revisión psiquiátrica: ${data.reviewOfSystems.psychiatric}`;
+  }
 
-## Preguntas repetidas o innecesarias
+  if (
+    includesAny(text, [
+      "laboratorios",
+      "laboratorio",
+      "hemograma",
+      "creatinina",
+      "glicemia",
+      "inr",
+      "electrolitos",
+      "bnp"
+    ])
+  ) {
+    return `Laboratorios disponibles: ${list(data.results.labs)}`;
+  }
 
-## Comentario sobre comunicación y empatía
+  if (
+    includesAny(text, [
+      "imagenes",
+      "imagen",
+      "radiografia",
+      "tac",
+      "tomografia",
+      "ecografia",
+      "resonancia"
+    ])
+  ) {
+    return `Imágenes disponibles: ${list(data.results.imaging)}`;
+  }
 
-## Recomendaciones concretas para mejorar
+  if (
+    includesAny(text, [
+      "electrocardiograma",
+      "ecg",
+      "estudios complementarios",
+      "paraclinicos",
+      "ayudas diagnosticas"
+    ])
+  ) {
+    return `Estudios complementarios disponibles: ${list(data.results.complementaryStudies)}`;
+  }
 
-## Objetivo académico esperado
-Indica el objetivo académico esperado, aclarando que corresponde a una simulación ficticia.
-`.trim();
+  if (
+    includesAny(text, [
+      "diagnostico",
+      "cie10",
+      "cie 10",
+      "diagnostico definitivo",
+      "diagnostico presuntivo",
+      "plan",
+      "tratamiento",
+      "conducta",
+      "interconsulta",
+      "ordenes medicas",
+      "epicrisis",
+      "diagnosticos finales"
+    ])
+  ) {
+    return "Esa parte debe construirla usted al finalizar la entrevista y será revisada en la retroalimentación académica.";
+  }
+
+  return null;
 }
