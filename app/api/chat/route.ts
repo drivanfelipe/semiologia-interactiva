@@ -1031,7 +1031,8 @@ export async function POST(request: Request) {
         role: m.role,
         content: cleanText(m.content)
       }))
-      .filter((m: Message) => m.content.length > 0);
+      .filter((m: Message) => m.content.length > 0)
+      .slice(-24);
 
     if (isSimpleGreeting(studentMessage)) {
       return NextResponse.json({
