@@ -96,26 +96,6 @@ function calculateRemainingSeconds(startedAt: number): number {
   return Math.max(0, CONSULTATION_LIMIT_SECONDS - elapsedSeconds);
 }
 
-function loadStoredMessages(studentCode: string, caseId: string): ChatMessage[] {
-  if (typeof window === "undefined") return [];
-
-  try {
-    const rawValue = window.localStorage.getItem(getMessagesKey(studentCode, caseId));
-    const parsedValue = rawValue ? JSON.parse(rawValue) : [];
-
-    if (!Array.isArray(parsedValue)) return [];
-
-    return parsedValue.filter(
-      (item) =>
-        item &&
-        (item.role === "student" || item.role === "patient" || item.role === "system") &&
-        typeof item.content === "string"
-    );
-  } catch {
-    return [];
-  }
-}
-
 function saveStoredMessages(studentCode: string, caseId: string, messages: ChatMessage[]) {
   if (typeof window === "undefined") return;
 
@@ -123,6 +103,12 @@ function saveStoredMessages(studentCode: string, caseId: string, messages: ChatM
     getMessagesKey(studentCode, caseId),
     JSON.stringify(messages)
   );
+}
+
+function clearStoredMessages(studentCode: string, caseId: string) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.removeItem(getMessagesKey(studentCode, caseId));
 }
 
 function blockClipboardAction(
@@ -277,25 +263,18 @@ export default function HomePage() {
       ? CONSULTATION_LIMIT_SECONDS
       : calculateRemainingSeconds(startedAt);
 
-    const storedMessages = loadStoredMessages(student.code, caseOption.id);
-
-    const initialMessages =
-      storedMessages.length > 0
-        ? storedMessages
-        : [
-            {
-              role: "system" as const,
-              content: `Ha seleccionado ${caseOption.publicLabel}: ${caseOption.publicSex}, ${caseOption.publicAge} años.\n\nUsted se encuentra en una simulación clínica. Inicie la entrevista con la persona simulada.`
-            }
-          ];
+    clearStoredMessages(student.code, caseOption.id);
 
     setSelectedCaseId(caseOption.id);
     setCaseStartedAt(startedAt);
-    setMessages(initialMessages);
+    setMessages([]);
+    setMessage("");
     setRemainingSeconds(remaining);
     setTimeExpired(false);
     setSuspended(false);
     setError("");
+    setDiagnosticImpression("");
+    setEvaluation("");
 
     if (!isProfessor && remaining <= 0) {
       setTimeExpired(true);
@@ -447,8 +426,8 @@ export default function HomePage() {
                 <span>Tiempo máximo de entrevista para estudiantes</span>
               </div>
               <div>
-                <strong>3 pacientes</strong>
-                <span>Casos clínicos ocultos</span>
+                <strong>6 pacientes</strong>
+                <span>Casos clínicos simulados</span>
               </div>
               <div>
                 <strong>Modo profesor</strong>
@@ -551,7 +530,7 @@ export default function HomePage() {
                 onClick={() => chooseCase(item)}
               >
                 <div className="case-card-top">
-                  <span className="case-number">0{index + 1}</span>
+                  <span className="case-number">{String(index + 1).padStart(2, "0")}</span>
                   <span className="case-chip">Paciente virtual</span>
                 </div>
 
