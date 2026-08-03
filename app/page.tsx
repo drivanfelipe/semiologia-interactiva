@@ -65,9 +65,7 @@ function getSessionKey(studentCode: string, caseId: string): string {
   return `${STORAGE_PREFIX}:started-at:${normalizeStorageValue(studentCode)}:${caseId}`;
 }
 
-function getMessagesKey(studentCode: string, caseId: string): string {
-  return `${STORAGE_PREFIX}:messages:${normalizeStorageValue(studentCode)}:${caseId}`;
-}
+
 
 function getStoredStartTime(studentCode: string, caseId: string): number | null {
   if (typeof window === "undefined") return null;
@@ -96,20 +94,7 @@ function calculateRemainingSeconds(startedAt: number): number {
   return Math.max(0, CONSULTATION_LIMIT_SECONDS - elapsedSeconds);
 }
 
-function saveStoredMessages(studentCode: string, caseId: string, messages: ChatMessage[]) {
-  if (typeof window === "undefined") return;
 
-  window.localStorage.setItem(
-    getMessagesKey(studentCode, caseId),
-    JSON.stringify(messages)
-  );
-}
-
-function clearStoredMessages(studentCode: string, caseId: string) {
-  if (typeof window === "undefined") return;
-
-  window.localStorage.removeItem(getMessagesKey(studentCode, caseId));
-}
 
 function blockClipboardAction(
   event: ClipboardEvent<HTMLTextAreaElement> | DragEvent<HTMLTextAreaElement>
@@ -196,11 +181,6 @@ export default function HomePage() {
     return () => window.clearInterval(interval);
   }, [step, caseStartedAt, professorMode]);
 
-  useEffect(() => {
-    if (!student || !selectedCaseId || messages.length === 0) return;
-
-    saveStoredMessages(student.code, selectedCaseId, messages);
-  }, [student, selectedCaseId, messages]);
 
   async function loadCaseOptions() {
     const res = await fetch("/api/cases");
@@ -222,7 +202,7 @@ export default function HomePage() {
       const res = await fetch("/api/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, code })
+        body: JSON.stringify({ code })
       });
 
       const data = await res.json();
@@ -263,7 +243,7 @@ export default function HomePage() {
       ? CONSULTATION_LIMIT_SECONDS
       : calculateRemainingSeconds(startedAt);
 
-    clearStoredMessages(student.code, caseOption.id);
+    
 
     setSelectedCaseId(caseOption.id);
     setCaseStartedAt(startedAt);
@@ -444,38 +424,20 @@ export default function HomePage() {
           <form className="card login-card form-grid" onSubmit={startSession}>
             <div>
               <span className="kicker">Acceso registrado</span>
-              <h2>Ingreso del estudiante</h2>
+              <h2>Ingreso con ID</h2>
               <p className="small">
-                Ingresa tu nombre, apellido y el ID de identificación entregado por el docente.
+                Ingresa únicamente el ID de identificación entregado por el docente.
               </p>
             </div>
 
-            <label>
-              Nombre
-              <input
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Ej. Juan"
-                autoComplete="given-name"
-              />
-            </label>
 
-            <label>
-              Apellido
-              <input
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Ej. Pérez"
-                autoComplete="family-name"
-              />
-            </label>
 
             <label>
               ID de identificación
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="572698"
+                placeholder="Ingresa tu ID"
                 inputMode="numeric"
               />
             </label>
