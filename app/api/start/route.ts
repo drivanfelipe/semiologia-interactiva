@@ -1,31 +1,33 @@
 import { NextResponse } from "next/server";
-import { normalizeCode, validateRegisteredStudent } from "../../../lib/accessCodes";
+import { getStudentByAccessCode } from "../../../lib/accessCodes";
 import { cleanText } from "../../../lib/validators";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const firstName = cleanText(body.firstName);
-    const lastName = cleanText(body.lastName);
-    const code = normalizeCode(cleanText(body.code));
+    const code = cleanText(body?.code);
 
-    if (!firstName || !lastName || !code) {
+    if (!code) {
       return NextResponse.json(
-        { ok: false, error: "Completa nombre, apellido y código." },
+        {
+          ok: false,
+          error: "Debes ingresar tu ID de identificación."
+        },
         { status: 400 }
       );
     }
 
-    const validation = validateRegisteredStudent(firstName, lastName, code);
+    const student = getStudentByAccessCode(code);
 
-    if (!validation.valid || !validation.record) {
+    if (!student) {
       return NextResponse.json(
         {
           ok: false,
           error:
-            validation.error ||
-            "El nombre, apellido o código no coinciden con el registro asignado."
+            "ID no autorizado. Verifica el número ingresado o informa al docente."
         },
         { status: 401 }
       );
@@ -34,14 +36,20 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       student: {
-        firstName: validation.record.firstName,
-        lastName: validation.record.lastName,
-        code: validation.record.code
+        firstName: student.firstName,
+        lastName: student.lastName,
+        code: student.code,
+        role: student.role
       }
     });
-  } catch {
+  } catch (error: any) {
+    console.error("ERROR START:", error);
+
     return NextResponse.json(
-      { ok: false, error: "No se pudo iniciar la sesión." },
+      {
+        ok: false,
+        error: "No se pudo iniciar la práctica."
+      },
       { status: 500 }
     );
   }
