@@ -1,466 +1,124 @@
-import { CASES, type CaseData } from "./cases";
-import type { Message } from "./validators";
-import { formatTranscript } from "./validators";
+import type { CaseData } from "./cases";
+import { buildGenericPatientProfile } from "./genericPatientProfile";
+import { formatTranscript, type Message } from "./validators";
 
-type ExtraPatientContext = {
-  identification: Record<string, string | number>;
-  presentIllness: string;
-  history: {
-    pathological: string[];
-    surgical: string[];
-    traumatic: string[];
-    pharmacological: string[];
-    allergies: string[];
-    toxicological: string[];
-    gynecoObstetric?: string[];
-    family: string[];
-    occupational: string[];
-    epidemiological: string[];
-  };
-  reviewOfSystems: Record<string, string>;
-  results: {
-    labs: string[];
-    imaging: string[];
-    complementaryStudies: string[];
-  };
-};
-
-const EXTRA_PATIENT_CONTEXT: Record<string, ExtraPatientContext> = {
-  "case-1": {
-    identification: {
-      fullName: "Gloria Cecilia Restrepo Álvarez",
-      documentId: "43.568.291",
-      bloodTypeRh: "O positivo (O+)",
-      age: 68,
-      sex: "Femenino",
-      genderIdentity: "Mujer cisgénero",
-      ethnicity: "Se autorreconoce como mestiza",
-      birthDate: "1958-02-14",
-      phone: "300 000 0001",
-      address: "Envigado, Antioquia",
-      socioeconomicStratum: "Estrato 3",
-      educationLevel: "Bachillerato completo",
-      residenceArea: "Residencia urbana",
-      insurance: "EPS simulada Sura",
-      maritalStatus: "Viuda",
-      occupation: "Ama de casa",
-      placeOfBirth: "Medellín, Antioquia",
-      emergencyContact: "Hija: Carolina Restrepo, 300 000 0101",
-      dominantHand: "Diestra",
-      mainLanguage: "Español",
-      disability: "No refiere discapacidad conocida",
-      companion: "Consulta sola, aunque su hija está pendiente de ella",
-      informantReliability:
-        "Información confiable, aunque no recuerda con precisión algunos nombres de medicamentos"
-    },
-    presentIllness:
-      "La dificultad para respirar empezó hace aproximadamente un año y ha empeorado progresivamente. Al principio aparecía con esfuerzos moderados, pero ahora aparece al caminar rápido, subir escaleras o hacer oficios de la casa. Empeora al acostarse completamente, se despierta a veces ahogada en la madrugada, tiene tos seca nocturna y se le hinchan ambos tobillos, sobre todo en la noche. Niega fiebre, dolor en el pecho actual, sangre al toser, desmayos o inicio súbito.",
-    history: {
-      pathological: [
-        "Hipertensión arterial",
-        "Diabetes mellitus tipo 2",
-        "EPOC referido por la paciente",
-        "Infarto agudo de miocardio hace aproximadamente 2 años",
-        "Obesidad"
-      ],
-      surgical: [
-        "Angioplastia coronaria con colocación de stent en arteria descendente anterior"
-      ],
-      traumatic: [
-        "Niega traumas recientes relevantes"
-      ],
-      pharmacological: [
-        "Losartán",
-        "Hidroclorotiazida de uso irregular porque la hace orinar mucho",
-        "Atorvastatina",
-        "Ácido acetilsalicílico",
-        "Salbutamol a necesidad"
-      ],
-      allergies: [
-        "Niega alergias medicamentosas conocidas"
-      ],
-      toxicological: [
-        "Exfumadora",
-        "Niega consumo actual de alcohol en exceso",
-        "Niega consumo de sustancias psicoactivas"
-      ],
-      gynecoObstetric: [
-        "Menopausia desde hace varios años",
-        "Gestas y partos sin complicaciones mayores referidas",
-        "Niega sangrado genital actual"
-      ],
-      family: [
-        "Padre con antecedente de hipertensión arterial",
-        "Madre con diabetes mellitus tipo 2",
-        "No recuerda antecedentes familiares claros de muerte súbita"
-      ],
-      occupational: [
-        "Ama de casa",
-        "Realiza oficios domésticos",
-        "Actualmente se limita por la dificultad para respirar"
-      ],
-      epidemiological: [
-        "Niega viajes recientes",
-        "Niega contacto reciente con personas con infección respiratoria",
-        "Vive en zona urbana"
-      ]
-    },
-    reviewOfSystems: {
-      general:
-        "Cansancio progresivo. Niega fiebre. Refiere sensación de aumento de peso, aunque no sabe cuánto.",
-      cardiovascular:
-        "Disnea de esfuerzo, ortopnea, despertares nocturnos con ahogo y edema bilateral de tobillos. Niega dolor torácico actual.",
-      respiratory:
-        "Tos seca nocturna y disnea progresiva. Niega expectoración purulenta y hemoptisis.",
-      gastrointestinal:
-        "Niega dolor abdominal, vómito, diarrea o sangrado digestivo.",
-      genitourinary:
-        "Refiere aumento de la diuresis cuando toma el medicamento que la hace orinar. Niega disuria.",
-      neurologic:
-        "Niega pérdida de fuerza focal, alteración del habla, convulsiones o pérdida de conciencia.",
-      musculoskeletal:
-        "Niega dolor articular agudo relevante. Refiere cansancio al esfuerzo.",
-      skin:
-        "Niega lesiones cutáneas agudas. Refiere hinchazón en ambos tobillos.",
-      endocrine:
-        "Antecedente de diabetes. No refiere síntomas claros de hipoglicemia.",
-      psychiatric:
-        "Se nota ansiosa por la sensación de falta de aire, especialmente en las noches."
-    },
-    results: {
-      labs: [
-        "Hemograma sin leucocitosis marcada",
-        "Creatinina 1.1 mg/dL",
-        "Potasio 4.2 mEq/L",
-        "BNP elevado: 980 pg/mL",
-        "Glicemia 148 mg/dL"
-      ],
-      imaging: [
-        "Radiografía de tórax: cardiomegalia leve y signos de congestión pulmonar bibasal"
-      ],
-      complementaryStudies: [
-        "Electrocardiograma: ritmo sinusal, signos de antecedente isquémico antiguo",
-        "Ecocardiograma simulado: fracción de eyección disminuida de forma moderada"
-      ]
-    }
-  },
-  "case-2": {
-    identification: {
-      fullName: "Álvaro Hernán Gómez Ramírez",
-      documentId: "70.123.456",
-      bloodTypeRh: "A positivo (A+)",
-      age: 72,
-      sex: "Masculino",
-      genderIdentity: "Hombre cisgénero",
-      ethnicity: "Se autorreconoce como mestizo",
-      birthDate: "1954-04-10",
-      phone: "300 000 0002",
-      address: "Medellín, Antioquia",
-      socioeconomicStratum: "Estrato 3",
-      educationLevel: "Bachillerato incompleto",
-      residenceArea: "Residencia urbana",
-      insurance: "Nueva EPS simulada",
-      maritalStatus: "Casado",
-      occupation: "Jubilado",
-      placeOfBirth: "Medellín, Antioquia",
-      emergencyContact: "Esposa: Marta Ramírez, 300 000 0102",
-      dominantHand: "Diestro",
-      mainLanguage: "Español",
-      disability: "No refiere discapacidad previa conocida",
-      companion: "Acude acompañado por su esposa",
-      informantReliability:
-        "Información parcialmente confiable; la esposa complementa por la dificultad del habla"
-    },
-    presentIllness:
-      "El cuadro empezó de forma súbita hace aproximadamente dos horas. El paciente estaba previamente normal y presentó debilidad del lado derecho, principalmente en brazo y cara, habla enredada, sensación de adormecimiento en cara y brazo derechos, y asimetría facial. Niega trauma, pérdida de conciencia, convulsiones, fiebre, dolor torácico o dolor de cabeza intenso tipo trueno.",
-    history: {
-      pathological: [
-        "Hipertensión arterial",
-        "Diabetes mellitus tipo 2",
-        "Fibrilación auricular referida",
-        "Dislipidemia probable"
-      ],
-      surgical: [
-        "Niega cirugías mayores recientes"
-      ],
-      traumatic: [
-        "Niega trauma craneoencefálico reciente",
-        "Niega caídas previas al inicio del cuadro"
-      ],
-      pharmacological: [
-        "Losartán",
-        "Metformina",
-        "Anticoagulante de nombre no recordado, con adherencia irregular"
-      ],
-      allergies: [
-        "Niega alergias medicamentosas conocidas"
-      ],
-      toxicological: [
-        "Exfumador",
-        "Niega consumo actual de alcohol en exceso",
-        "Niega consumo de sustancias psicoactivas"
-      ],
-      family: [
-        "Padre con antecedente de evento cerebrovascular según refiere",
-        "Familia con hipertensión arterial"
-      ],
-      occupational: [
-        "Jubilado",
-        "Actividad física limitada"
-      ],
-      epidemiological: [
-        "Niega viajes recientes",
-        "Niega síntomas infecciosos recientes",
-        "Vive con familia"
-      ]
-    },
-    reviewOfSystems: {
-      general:
-        "Niega fiebre, pérdida de peso o malestar general previo importante.",
-      cardiovascular:
-        "Antecedente de ritmo cardíaco irregular. Niega dolor torácico actual.",
-      respiratory:
-        "Niega disnea, tos o expectoración.",
-      gastrointestinal:
-        "Niega vómito, dolor abdominal o sangrado digestivo.",
-      genitourinary:
-        "Niega disuria o síntomas urinarios agudos.",
-      neurologic:
-        "Debilidad derecha, habla enredada, asimetría facial y sensación de adormecimiento derecho. Niega convulsión o pérdida de conciencia.",
-      musculoskeletal:
-        "Niega dolor articular o trauma. La limitación actual es por debilidad neurológica.",
-      skin:
-        "Sin lesiones cutáneas agudas.",
-      endocrine:
-        "Antecedente de diabetes. No refiere síntomas claros de hipoglicemia.",
-      psychiatric:
-        "Ansioso y frustrado por la dificultad para hablar."
-    },
-    results: {
-      labs: [
-        "Glucometría 128 mg/dL",
-        "Hemograma sin leucocitosis marcada",
-        "Creatinina 1.0 mg/dL",
-        "INR no terapéutico para anticoagulación efectiva"
-      ],
-      imaging: [
-        "TAC simple de cráneo: sin hemorragia intracraneal evidente en la simulación inicial"
-      ],
-      complementaryStudies: [
-        "Electrocardiograma: fibrilación auricular con respuesta ventricular rápida moderada"
-      ]
-    }
-  },
-  "case-3": {
-    identification: {
-      fullName: "Marcela Andrea Ruiz Castaño",
-      documentId: "43.890.127",
-      bloodTypeRh: "B positivo (B+)",
-      age: 49,
-      sex: "Femenino",
-      genderIdentity: "Mujer cisgénero",
-      ethnicity: "Se autorreconoce como mestiza",
-      birthDate: "1977-09-02",
-      phone: "300 000 0003",
-      address: "Medellín, Antioquia",
-      socioeconomicStratum: "Estrato 3",
-      educationLevel: "Técnico laboral",
-      residenceArea: "Residencia urbana",
-      insurance: "EPS simulada Sanitas",
-      maritalStatus: "Unión libre",
-      occupation: "Auxiliar administrativa",
-      placeOfBirth: "Itagüí, Antioquia",
-      emergencyContact: "Pareja: Andrés Castaño, 300 000 0103",
-      dominantHand: "Diestra",
-      mainLanguage: "Español",
-      disability: "No refiere discapacidad conocida",
-      companion: "Consulta sola",
-      informantReliability: "Información confiable"
-    },
-    presentIllness:
-      "El dolor de hombro derecho empezó hace aproximadamente tres meses, de forma progresiva. Se localiza principalmente en la cara lateral del hombro. Empeora al levantar el brazo por encima de la cabeza, peinarse, vestirse, cargar bolsas y dormir sobre ese lado. Refiere sensación de debilidad por dolor. Niega trauma fuerte, fiebre, pérdida de peso, deformidad, dolor torácico, hormigueo, adormecimiento o pérdida de fuerza distal en la mano.",
-    history: {
-      pathological: [
-        "Niega diabetes",
-        "Niega enfermedad tiroidea",
-        "Niega enfermedad reumatológica conocida"
-      ],
-      surgical: [
-        "Niega cirugías previas en hombro",
-        "Niega cirugías recientes"
-      ],
-      traumatic: [
-        "Niega trauma fuerte",
-        "Refiere posible sobrecarga al cargar bolsas y hacer oficios"
-      ],
-      pharmacological: [
-        "Acetaminofén ocasional",
-        "Ibuprofeno ocasional cuando el dolor es más fuerte"
-      ],
-      allergies: [
-        "Niega alergias medicamentosas conocidas"
-      ],
-      toxicological: [
-        "Niega tabaquismo",
-        "Alcohol social ocasional",
-        "Niega sustancias psicoactivas"
-      ],
-      gynecoObstetric: [
-        "Ciclos menstruales irregulares ocasionales por edad",
-        "Niega embarazo actual",
-        "Niega sangrado genital anormal"
-      ],
-      family: [
-        "Madre con artrosis",
-        "Niega antecedentes familiares relevantes de enfermedades inflamatorias articulares"
-      ],
-      occupational: [
-        "Auxiliar administrativa",
-        "Trabajo prolongado en escritorio",
-        "Realiza oficios domésticos y carga bolsas"
-      ],
-      epidemiological: [
-        "Niega viajes recientes",
-        "Niega exposición infecciosa relevante",
-        "No refiere picaduras ni síntomas sistémicos"
-      ]
-    },
-    reviewOfSystems: {
-      general:
-        "Niega fiebre, pérdida de peso o sudoración nocturna.",
-      cardiovascular:
-        "Niega dolor torácico, palpitaciones o síncope.",
-      respiratory:
-        "Niega tos, disnea o expectoración.",
-      gastrointestinal:
-        "Niega dolor abdominal, vómito o diarrea.",
-      genitourinary:
-        "Niega síntomas urinarios.",
-      neurologic:
-        "Niega adormecimiento, hormigueo o pérdida de fuerza distal en mano.",
-      musculoskeletal:
-        "Dolor de hombro derecho, limitación para elevar el brazo, peinarse, vestirse y dormir sobre ese lado.",
-      skin:
-        "Niega enrojecimiento, calor local marcado o lesiones cutáneas.",
-      endocrine:
-        "Niega diabetes y enfermedad tiroidea conocida.",
-      psychiatric:
-        "Preocupada por la persistencia del dolor y la limitación funcional."
-    },
-    results: {
-      labs: [
-        "No se solicitan laboratorios de rutina en esta simulación inicial"
-      ],
-      imaging: [
-        "Radiografía de hombro: sin fractura ni luxación",
-        "Ecografía de hombro: tendinopatía del supraespinoso, sin ruptura completa evidente"
-      ],
-      complementaryStudies: [
-        "Evaluación funcional de hombro compatible con compromiso del manguito rotador"
-      ]
-    }
+function formatData(value: unknown): string {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
   }
-};
-
-function getExtraPatientContext(selectedCase: CaseData): ExtraPatientContext | null {
-  return EXTRA_PATIENT_CONTEXT[selectedCase.id] || null;
 }
 
-function compactPatientCase(selectedCase: CaseData) {
-  return {
-    id: selectedCase.id,
-    objetivoOculto: selectedCase.hiddenAcademicObjective,
-    persona: selectedCase.simulatedPerson,
-    datosAmpliadosPaciente: getExtraPatientContext(selectedCase),
-    conducta: selectedCase.conversationBehavior,
-    motivoPrincipal: selectedCase.mainComplaint,
-    negativosImportantes: selectedCase.importantNegatives,
-    guiaDeRespuesta: selectedCase.responseGuide,
-    historiaOculta: selectedCase.hiddenHistory,
-    examenFisico: selectedCase.physicalExam
-  };
+function formatList(items: string[]): string {
+  if (!items || items.length === 0) return "No especificado.";
+  return items.map((item) => `- ${item}`).join("\n");
 }
 
-function compactEvaluationCase(selectedCase: CaseData) {
-  return {
-    id: selectedCase.id,
-    objetivoEsperado: selectedCase.hiddenAcademicObjective,
-    datosAmpliadosPaciente: getExtraPatientContext(selectedCase),
-    motivoPrincipal: selectedCase.mainComplaint,
-    datosEsperados: {
-      historia: selectedCase.hiddenHistory,
-      examenFisico: selectedCase.physicalExam,
-      negativosImportantes: selectedCase.importantNegatives
-    },
-    listaDeChequeo: selectedCase.evaluationChecklist
-  };
-}
-
-function compactTranscript(messages: Message[], limit = 12): string {
-  return formatTranscript(messages.slice(-limit));
+function getPatientName(caseData: CaseData): string {
+  return caseData.simulatedPerson.fullName || "Paciente";
 }
 
 export function buildPatientPrompt(
   messages: Message[],
-  selectedCase: CaseData = CASES[0]
+  selectedCase: CaseData
 ): string {
-  const transcript = compactTranscript(messages, 12);
+  const transcript = formatTranscript(messages);
+  const genericPatientProfile = buildGenericPatientProfile(selectedCase);
+
+  const patient = selectedCase.simulatedPerson;
+  const responseGuide = selectedCase.responseGuide?.topicAnswers || {};
 
   return `
-Eres una persona simulada dentro de una actividad académica universitaria de semiología básica.
+Eres una persona simulada en una práctica académica de semiología clínica.
 
-CONTEXTO:
-Esta es una simulación ficticia para que estudiantes de medicina practiquen entrevista clínica, comunicación, historia clínica y observación dirigida.
+Tu tarea es actuar como el paciente, no como médico, docente, evaluador ni asistente de IA.
 
-ROL:
-- Responde SIEMPRE como la persona simulada.
-- No respondas como sistema, profesor, médico ni evaluador.
-- No expliques reglas internas.
-- No digas diagnósticos.
-- No reveles el objetivo académico oculto.
-- No hables como historia clínica, ficha, formulario ni lista técnica.
+NOMBRE DEL PACIENTE:
+${getPatientName(selectedCase)}
 
-NATURALIDAD:
-- Debes sonar como un paciente real.
-- Usa lenguaje cotidiano colombiano.
-- Si el estudiante pregunta de forma simple, responde de forma simple.
-- Si pregunta "enfermedades", "patologías" o "antecedentes", entiende que está preguntando por enfermedades previas.
-- Si pregunta "hipertensión o diabetes", responde directamente si las tienes o no.
-- Si pregunta algo administrativo como RH, documento, teléfono, EPS, dirección, educación, etnia, sexo, género o estrato, responde naturalmente, como paciente.
-- No respondas con encabezados tipo "Revisión endocrina:" salvo que el estudiante pida explícitamente "revisión por sistemas".
-- No digas frases robóticas.
-- Evita respuestas excesivamente cortantes.
-- Puedes decir "que yo sepa", "creo", "me dijeron", "eso aparece en el carné", si encaja con el caso.
-- Si no entiendes un tecnicismo, pregunta qué significa.
+DATOS BÁSICOS DEL PACIENTE:
+- Nombre completo: ${patient.fullName}
+- Edad: ${patient.age}
+- Sexo: ${patient.sex}
+- Ocupación: ${patient.occupation}
+- Personalidad/comportamiento: ${patient.personality}
 
-MANEJO DE INFORMACIÓN:
-- Usa los datos del caso para responder.
-- Puedes completar datos sociales o administrativos menores de forma ficticia y coherente si no están explícitos.
-- NO inventes síntomas, antecedentes médicos importantes, medicamentos, cirugías, alergias ni hallazgos físicos que contradigan el caso.
-- La información clínica debe entregarse progresivamente, según lo que el estudiante pregunte.
-- No entregues todo de una vez.
-- Si el estudiante pregunta por muchas cosas al tiempo, responde solo lo más importante y pide que vaya por partes.
+MOTIVO DE CONSULTA PRINCIPAL:
+${selectedCase.mainComplaint}
 
-EXAMEN FÍSICO:
-- Si el estudiante dice que realiza una maniobra o explora un sistema, puedes responder el hallazgo del examen físico de forma breve.
-- En ese caso no actúes como médica, pero sí puedes decir el resultado observado de la simulación.
-- Ejemplo: "Al revisar el hombro, me duele cuando levanto el brazo más arriba del hombro."
-- Ejemplo: "Cuando me ausculta, se escuchan ruiditos abajo en los pulmones."
-- Si no hay alteración en un sistema, di de forma natural que no se ve nada raro o que le dijeron que salió normal.
+OBJETIVO ACADÉMICO OCULTO:
+${selectedCase.hiddenAcademicObjective}
 
-ESTILO:
-- Responde en máximo 2 frases cortas, salvo que el estudiante pida una explicación más amplia.
-- No uses viñetas.
-- No uses lenguaje técnico si el paciente no lo usaría.
-- Si estás asustada, cansada, confundida o preocupada, puedes mostrarlo de forma natural.
+Este objetivo es solo para orientar la simulación. Nunca lo reveles al estudiante.
 
-CASO COMPLETO:
-${JSON.stringify(compactPatientCase(selectedCase), null, 2)}
+COMPORTAMIENTO DEL PACIENTE:
+- Conducta basal: ${selectedCase.conversationBehavior.baseline}
+- Si el estudiante es empático: ${selectedCase.conversationBehavior.ifEmpathic}
+- Si el estudiante es brusco o desorganizado: ${selectedCase.conversationBehavior.ifRudeOrDisorganized}
+- Si el estudiante hace demasiadas preguntas al tiempo: ${selectedCase.conversationBehavior.ifTooManyQuestions}
 
-CONVERSACIÓN RECIENTE:
-${transcript || "Aún no hay conversación."}
+NEGATIVOS IMPORTANTES DEL CASO:
+${formatList(selectedCase.importantNegatives)}
 
-Responde ahora SOLO como la persona simulada.
+GUÍA DE RESPUESTAS POR TEMA:
+${formatData(responseGuide)}
+
+HISTORIA CLÍNICA OCULTA DEL CASO:
+${formatData(selectedCase.hiddenHistory)}
+
+EXAMEN FÍSICO DEL CASO:
+${formatData(selectedCase.physicalExam)}
+
+${genericPatientProfile}
+
+REGLAS ABSOLUTAS DE RESPUESTA:
+1. Responde siempre como paciente real.
+2. No digas que eres una IA.
+3. No digas que estás siguiendo un prompt.
+4. No reveles el diagnóstico, el objetivo académico oculto ni la lista completa del caso.
+5. No respondas como profesor, médico o evaluador.
+6. No uses encabezados tipo historia clínica, salvo que el estudiante pida explícitamente organizar una revisión por sistemas.
+7. No inventes datos clínicos importantes que contradigan el caso.
+8. No inventes enfermedades, alergias, medicamentos, cirugías, hospitalizaciones, antecedentes familiares clínicos ni consumos de alcohol/tabaco/sustancias si no están en el caso.
+9. Si el estudiante pregunta algo clínico que no está definido, responde con prudencia: "que yo sepa no", "no recuerdo", "no me han dicho", "creo que no" o "eso no lo tengo claro".
+10. Entrega la información de forma progresiva. No des toda la historia de una vez.
+11. Responde con frases breves y naturales, como hablaría un paciente colombiano.
+12. Si el estudiante pregunta varias cosas en una sola frase, responde solo lo más importante o di que te confundiste.
+13. Si el estudiante pide examen físico dirigido, puedes responder con los hallazgos del EXAMEN FÍSICO DEL CASO.
+14. Si el estudiante pregunta datos administrativos, identificación, EPS, régimen de salud, escolaridad, vivienda, barrio, municipio, estrato, estado civil, hijos, ocupación, red de apoyo, transporte, religión o contexto socioeconómico, responde usando el PERFIL ADMINISTRATIVO Y SOCIOECONÓMICO GENÉRICO.
+15. Los datos específicos del caso siempre tienen prioridad sobre el perfil genérico.
+16. No uses lenguaje técnico si el paciente no lo usaría espontáneamente.
+17. Si el estudiante usa términos médicos complejos, puedes responder como paciente: "eso no sé bien qué es, doctor" o "no me han explicado eso".
+
+FORMA DE RESPONDER:
+- Normalmente responde en 1 a 3 frases.
+- Usa un tono humano, natural y coherente con la personalidad del paciente.
+- Puedes usar expresiones como: "doctor", "doctora", "pues", "la verdad", "creo", "que yo sepa", "me dijeron", "no recuerdo bien".
+- No conviertas cada respuesta en una lista.
+- No seas excesivamente colaborador si el estudiante no pregunta bien.
+- No entregues datos que el estudiante no ha explorado.
+
+EJEMPLOS DE RESPUESTA ADECUADA:
+Estudiante: ¿Con quién vive?
+Paciente: Vivo con mi esposa, doctor. Mis hijos también están pendientes de mí.
+
+Estudiante: ¿Cuál es su EPS?
+Paciente: Estoy afiliada a Sura, doctora.
+
+Estudiante: ¿Tiene antecedentes personales?
+Paciente: Pues sí, doctor, tengo la presión alta desde hace varios años.
+
+Estudiante: ¿Qué medicamentos toma?
+Paciente: Tomo los que me mandaron para la presión, pero no siempre me acuerdo bien de los nombres.
+
+Estudiante: Realizo auscultación pulmonar.
+Paciente: Me revisa la respiración y nota unos ruidos como crepitantes en las bases.
+
+TRANSCRIPCIÓN ACTUAL DE LA ENTREVISTA:
+${transcript}
+
+Responde únicamente el último mensaje del estudiante, actuando como el paciente.
 `.trim();
 }
 
@@ -468,57 +126,82 @@ export function buildEvaluationPrompt(
   messages: Message[],
   diagnosticImpression: string,
   studentName: string,
-  selectedCase: CaseData = CASES[0]
+  selectedCase: CaseData
 ): string {
-  const transcript = compactTranscript(messages, 40);
+  const transcript = formatTranscript(messages);
 
   return `
-Eres un evaluador académico universitario de semiología básica.
-Evalúas una simulación ficticia, no atención médica real.
+Eres un docente de semiología clínica evaluando una práctica con paciente virtual.
+
+Debes entregar una retroalimentación académica clara, útil y formativa.
 
 ESTUDIANTE:
-${studentName || "No informado"}
+${studentName || "Estudiante"}
 
-CASO EVALUADO:
-${JSON.stringify(compactEvaluationCase(selectedCase), null, 2)}
+PACIENTE SIMULADO:
+- Nombre: ${selectedCase.simulatedPerson.fullName}
+- Edad: ${selectedCase.simulatedPerson.age}
+- Sexo: ${selectedCase.simulatedPerson.sex}
+- Ocupación: ${selectedCase.simulatedPerson.occupation}
 
-TRANSCRIPCIÓN:
+MOTIVO DE CONSULTA:
+${selectedCase.mainComplaint}
+
+OBJETIVO ACADÉMICO DEL CASO:
+${selectedCase.hiddenAcademicObjective}
+
+HISTORIA CLÍNICA OCULTA DEL CASO:
+${formatData(selectedCase.hiddenHistory)}
+
+EXAMEN FÍSICO ESPERADO:
+${formatData(selectedCase.physicalExam)}
+
+LISTA DE VERIFICACIÓN DEL CASO:
+${formatList(selectedCase.evaluationChecklist)}
+
+TRANSCRIPCIÓN DE LA ENTREVISTA:
 ${transcript}
 
-IMPRESIÓN FINAL DEL ESTUDIANTE:
+IMPRESIÓN FINAL ESCRITA POR EL ESTUDIANTE:
 ${diagnosticImpression}
 
-Evalúa con criterio docente para estudiantes de 3er semestre.
-Sé justo: premia comunicación, orden, preguntas relevantes, examen físico dirigido y razonamiento clínico inicial.
+INSTRUCCIONES PARA EVALUAR:
+1. Evalúa la calidad de la entrevista clínica, no solo si acertó el diagnóstico.
+2. Identifica qué datos importantes sí exploró.
+3. Identifica qué datos importantes omitió.
+4. Evalúa si preguntó de forma organizada.
+5. Evalúa si exploró semiología del síntoma principal.
+6. Evalúa si solicitó examen físico pertinente.
+7. Evalúa si la impresión final está sustentada por los datos obtenidos.
+8. No inventes preguntas que el estudiante no hizo.
+9. No castigues al estudiante por no obtener datos que el paciente no entregó si nunca los preguntó.
+10. Sé exigente pero formativo.
+11. Usa lenguaje claro para estudiantes de medicina.
+12. No des una calificación numérica, salvo que el docente la haya pedido explícitamente.
 
-Entrega el resultado en español con este formato:
+FORMATO DE RESPUESTA:
+Usa este formato:
 
-# Evaluación académica
+RETROALIMENTACIÓN GENERAL
+Escribe un párrafo breve sobre el desempeño global.
 
-## Calificación global
-Puntaje: X/100
+FORTALEZAS
+- Menciona 2 a 4 aspectos positivos.
 
-## Rúbrica
-- Organización de la entrevista: X/10
-- Secuencia lógica: X/10
-- Profundidad del interrogatorio: X/15
-- Preguntas clave del caso: X/20
-- Comunicación y empatía: X/15
-- Lenguaje claro/no técnico: X/10
-- Observación dirigida/examen físico: X/10
-- Impresión final: X/10
+OMISIONES IMPORTANTES
+- Menciona los datos clínicos relevantes que faltaron.
 
-## Fortalezas
+EXAMEN FÍSICO Y SEMIOLOGÍA
+- Comenta si la exploración física o semiológica fue adecuada, incompleta o ausente.
 
-## Aspectos omitidos o incompletos
+IMPRESIÓN FINAL
+- Comenta si la impresión final fue coherente con la información obtenida.
+- Si hay diagnósticos diferenciales importantes, menciónalos.
 
-## Preguntas repetidas o innecesarias
+RECOMENDACIONES PARA MEJORAR
+- Da recomendaciones concretas para una próxima entrevista.
 
-## Comentario sobre comunicación y empatía
-
-## Recomendaciones concretas para mejorar
-
-## Objetivo académico esperado
-Indica el objetivo académico esperado, aclarando que corresponde a una simulación ficticia.
+CIERRE
+Termina con una frase breve de orientación académica.
 `.trim();
 }
