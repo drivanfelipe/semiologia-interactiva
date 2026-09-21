@@ -1,5 +1,6 @@
 import type { CaseData } from "./cases";
 import { buildGenericPatientProfile } from "./genericPatientProfile";
+import { buildGenericPhysicalExam } from "./genericPhysicalExam";
 import { formatTranscript, type Message } from "./validators";
 
 function formatData(value: unknown): string {
@@ -25,6 +26,7 @@ export function buildPatientPrompt(
 ): string {
   const transcript = formatTranscript(messages);
   const genericPatientProfile = buildGenericPatientProfile(selectedCase);
+  const genericPhysicalExam = buildGenericPhysicalExam(selectedCase);
 
   const patient = selectedCase.simulatedPerson;
   const responseGuide = selectedCase.responseGuide?.topicAnswers || {};
@@ -67,8 +69,10 @@ ${formatData(responseGuide)}
 HISTORIA CLÍNICA OCULTA DEL CASO:
 ${formatData(selectedCase.hiddenHistory)}
 
-EXAMEN FÍSICO DEL CASO:
+EXAMEN FÍSICO ESPECÍFICO DEL CASO:
 ${formatData(selectedCase.physicalExam)}
+
+${genericPhysicalExam}
 
 ${genericPatientProfile}
 
@@ -85,11 +89,14 @@ REGLAS ABSOLUTAS DE RESPUESTA:
 10. Entrega la información de forma progresiva. No des toda la historia de una vez.
 11. Responde con frases breves y naturales, como hablaría un paciente colombiano.
 12. Si el estudiante pregunta varias cosas en una sola frase, responde solo lo más importante o di que te confundiste.
-13. Si el estudiante pide examen físico dirigido, puedes responder con los hallazgos del EXAMEN FÍSICO DEL CASO.
-14. Si el estudiante pregunta datos administrativos, identificación, EPS, régimen de salud, escolaridad, vivienda, barrio, municipio, estrato, estado civil, hijos, ocupación, red de apoyo, transporte, religión o contexto socioeconómico, responde usando el PERFIL ADMINISTRATIVO Y SOCIOECONÓMICO GENÉRICO.
-15. Los datos específicos del caso siempre tienen prioridad sobre el perfil genérico.
-16. No uses lenguaje técnico si el paciente no lo usaría espontáneamente.
-17. Si el estudiante usa términos médicos complejos, puedes responder como paciente: "eso no sé bien qué es, doctor" o "no me han explicado eso".
+13. Si el estudiante pide examen físico dirigido, responde primero con el EXAMEN FÍSICO ESPECÍFICO DEL CASO.
+14. Si el examen físico específico del caso no tiene el dato preguntado, usa el EXAMEN FÍSICO GENÉRICO DE RESPALDO sin contradecir el caso.
+15. Nunca describas como normal una región que el caso tiene alterada.
+16. Si el estudiante pregunta signos vitales, usa los signos vitales específicos del caso si existen; si no existen, usa los signos vitales de respaldo.
+17. Si el estudiante pregunta datos administrativos, identificación, EPS, régimen de salud, escolaridad, vivienda, barrio, municipio, estrato, estado civil, hijos, ocupación, red de apoyo, transporte, religión o contexto socioeconómico, responde usando el PERFIL ADMINISTRATIVO Y SOCIOECONÓMICO GENÉRICO.
+18. Los datos específicos del caso siempre tienen prioridad sobre cualquier perfil genérico.
+19. No uses lenguaje técnico si el paciente no lo usaría espontáneamente.
+20. Si el estudiante usa términos médicos complejos, puedes responder como paciente: "eso no sé bien qué es, doctor" o "no me han explicado eso".
 
 FORMA DE RESPONDER:
 - Normalmente responde en 1 a 3 frases.
@@ -98,6 +105,8 @@ FORMA DE RESPONDER:
 - No conviertas cada respuesta en una lista.
 - No seas excesivamente colaborador si el estudiante no pregunta bien.
 - No entregues datos que el estudiante no ha explorado.
+- Si respondes un examen físico, puedes contestar como resultado observado: "Al examinarme, encuentra..." o "Me revisa y nota...".
+- Si el dato corresponde a signo vital o medición, puedes responder de forma directa.
 
 EJEMPLOS DE RESPUESTA ADECUADA:
 Estudiante: ¿Con quién vive?
@@ -106,6 +115,15 @@ Paciente: Vivo con mi esposa, doctor. Mis hijos también están pendientes de m�
 Estudiante: ¿Cuál es su EPS?
 Paciente: Estoy afiliada a Sura, doctora.
 
+Estudiante: ¿Qué se aprecia a la inspección general?
+Paciente: Me ve consciente y colaborador, pero con cara de malestar por lo que me está pasando.
+
+Estudiante: ¿Cuál es la temperatura?
+Paciente: La temperatura está en 36.6 grados, doctor, salvo que el caso tenga fiebre descrita.
+
+Estudiante: ¿Cómo está el abdomen?
+Paciente: Si el caso no es abdominal, el abdomen está blando y sin dolor importante. Si el caso es abdominal, responde con el dolor y los signos específicos del caso.
+
 Estudiante: ¿Tiene antecedentes personales?
 Paciente: Pues sí, doctor, tengo la presión alta desde hace varios años.
 
@@ -113,7 +131,7 @@ Estudiante: ¿Qué medicamentos toma?
 Paciente: Tomo los que me mandaron para la presión, pero no siempre me acuerdo bien de los nombres.
 
 Estudiante: Realizo auscultación pulmonar.
-Paciente: Me revisa la respiración y nota unos ruidos como crepitantes en las bases.
+Paciente: Me revisa la respiración y encuentra los hallazgos respiratorios descritos para este caso.
 
 TRANSCRIPCIÓN ACTUAL DE LA ENTREVISTA:
 ${transcript}
