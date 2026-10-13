@@ -29,629 +29,388 @@ export type CaseData = {
 
 export const CASES: CaseData[] = [
   {
-    id: "case-1",
-    publicLabel: "Paciente 1",
-    publicSex: "Femenino",
-    publicAge: 68,
+    id: "case-9",
+    publicLabel: "Paciente 01",
+    publicSex: "Masculino",
+    publicAge: 36,
     simulatedPerson: {
-      fullName: "Gloria Cecilia Restrepo Álvarez",
-      age: 68,
-      sex: "Femenino",
-      occupation: "Ama de casa",
+      fullName: "Andrés Felipe Ospina Morales",
+      age: 36,
+      sex: "Masculino",
+      occupation: "Conductor de plataforma",
       personality:
-        "Paciente amable, algo ansiosa por la falta de aire, habla de forma sencilla y tiende a minimizar sus síntomas."
+        "Inquieto, adolorido, se mueve constantemente porque no encuentra posición cómoda. Responde de forma breve por el dolor."
     },
     hiddenAcademicObjective:
-      "Reconocer síndrome congestivo compatible con insuficiencia cardíaca crónica descompensada.",
-    mainComplaint: "Ay doctor, me falta mucho el aire.",
+      "Evaluar dolor lumbar/flanco tipo cólico usando ALICIA FREDUSA, irradiación a ingle, hematuria, síntomas urinarios, fiebre y puño-percusión renal para orientar cólico renoureteral.",
+    mainComplaint:
+      "Me dio un dolor muy fuerte en el lado izquierdo de la espalda y se me baja hacia la ingle.",
     conversationBehavior: {
       baseline:
-        "Responde de forma breve, natural y progresiva. No entrega toda la información si no se la preguntan.",
+        "Se muestra inquieto, cambia de posición y expresa dolor intenso. Contesta bien si le preguntan concreto.",
       ifEmpathic:
-        "Coopera más, explica mejor los síntomas y se muestra agradecida.",
+        "Agradece la ayuda y describe mejor la irradiación, la orina rojiza y las náuseas.",
       ifRudeOrDisorganized:
-        "Responde más corto, se muestra confundida o cansada.",
+        "Se impacienta porque tiene mucho dolor y pide que le pregunten de forma más clara.",
       ifTooManyQuestions:
-        "Dice que se confundió y pide que le pregunten de a poquito."
+        "Dice que son muchas preguntas y que solo alcanza a explicar que el dolor es muy fuerte y se baja a la ingle."
     },
     importantNegatives: [
-      "Niega fiebre.",
-      "Niega dolor torácico actual.",
-      "Niega hemoptisis.",
-      "Niega síncope.",
-      "Niega inicio súbito del cuadro.",
-      "Niega síntomas neurológicos focales."
+      "No fiebre",
+      "No hipotensión",
+      "No anuria",
+      "No dolor testicular primario de inicio escrotal",
+      "No defensa abdominal",
+      "No antecedente de trauma",
+      "No inmunosupresión",
+      "No secreción uretral"
     ],
     responseGuide: {
       topicAnswers: {
-        "disnea":
-          "Me falta el aire, sobre todo cuando camino rápido o subo escalas.",
-        "ortopnea":
-          "Cuando me acuesto completamente me ahogo más, por eso duermo con almohadas.",
-        "edema":
-          "Se me hinchan los tobillos, más que todo por la noche.",
-        "tos":
-          "Me da una tos seca, sobre todo en la noche.",
-        "dolor toracico":
-          "Dolor en el pecho ahora no tengo, doctor.",
-        "medicamentos":
-          "Tomo pastillas para la presión y para el colesterol, pero la que me hace orinar a veces no me la tomo."
+        motivo:
+          "Me empezó un dolor muy fuerte en el lado izquierdo de la espalda y se me baja hacia la ingle.",
+        dolor:
+          "Es un dolor tipo cólico, muy fuerte, como por oleadas. No encuentro cómo acomodarme.",
+        aparicion:
+          "Empezó de repente hace unas cuatro horas.",
+        localizacion:
+          "Lo siento en el lado izquierdo de la espalda baja, como en el flanco.",
+        irradiacion:
+          "Se me baja hacia la ingle izquierda y a veces hacia el testículo.",
+        caracter:
+          "Es como un cólico muy fuerte, viene por oleadas.",
+        intensidad:
+          "Está como en 9 de 10.",
+        agravantesAtenuantes:
+          "No encuentro posición que me lo quite. Me muevo y me muevo, pero nada me acomoda.",
+        frecuenciaDuracion:
+          "Viene por oleadas desde que empezó, pero no se me ha quitado del todo.",
+        sintomasAsociados:
+          "Me han dado náuseas, vomité una vez y la orina la vi como rojiza.",
+        urinario:
+          "La orina la vi algo oscura o rojiza. Ardor como tal, muy poquito.",
+        fiebre:
+          "No, fiebre no he tenido.",
+        antecedentes:
+          "No tengo enfermedad renal conocida. Tomo poca agua por el trabajo y una vez había sentido algo parecido, pero más leve.",
+        paraclinicos:
+          "Si me hacen orina, sale sangre en la orina. La ecografía podría mostrar algo de dilatación del lado izquierdo."
       }
     },
     hiddenHistory: {
-      identification: {
-        fullName: "Gloria Cecilia Restrepo Álvarez",
-        documentId: "43.568.291",
-        bloodTypeRh: "O positivo (O+)",
-        age: 68,
-        sex: "Femenino",
-        genderIdentity: "Mujer cisgénero",
-        ethnicity: "Se autorreconoce como mestiza",
-        birthDate: "1958-02-14",
-        phone: "300 000 0001",
-        address: "Envigado, Antioquia",
-        socioeconomicStratum: "Estrato 3",
-        educationLevel: "Bachillerato completo",
-        residenceArea: "Residencia urbana",
-        insurance: "EPS simulada Sura",
-        maritalStatus: "Viuda",
-        occupation: "Ama de casa",
-        placeOfBirth: "Medellín, Antioquia",
-        emergencyContact: "Hija: Carolina Restrepo, 300 000 0101",
-        dominantHand: "Diestra",
-        mainLanguage: "Español",
-        disability: "No refiere discapacidad conocida",
-        companion: "Consulta sola, aunque su hija está pendiente de ella",
-        informantReliability:
-          "Información confiable, aunque no recuerda con precisión algunos nombres de medicamentos"
+      diagnosis: "Cólico renoureteral izquierdo por litiasis ureteral",
+      aliciaFredusa: {
+        aparicion: "Inicio súbito hace 4 horas.",
+        localizacion: "Flanco izquierdo / región lumbar izquierda.",
+        irradiacion: "Ingle izquierda y testículo izquierdo.",
+        caracter: "Tipo cólico, intenso, en oleadas.",
+        intensidad: "9/10.",
+        atenuantesAgravantes:
+          "No encuentra posición que alivie. Se mueve buscando acomodarse.",
+        frecuencia: "Oleadas recurrentes sobre dolor de base.",
+        duracion: "Episodios de varios minutos repetidos desde el inicio.",
+        sintomasAsociados:
+          "Náuseas, un vómito, orina rojiza, ardor urinario leve ocasional."
       },
-      presentIllness:
-        "Disnea de aproximadamente un año de evolución, progresiva. Inicialmente con esfuerzos moderados y actualmente con esfuerzos menores. Empeora al acostarse, presenta despertares nocturnos con sensación de ahogo, tos seca nocturna y edema bilateral de tobillos de predominio vespertino.",
-      history: {
-        pathological: [
-          "Hipertensión arterial",
-          "Diabetes mellitus tipo 2",
-          "EPOC referido por la paciente",
-          "Infarto agudo de miocardio hace aproximadamente 2 años",
-          "Obesidad"
-        ],
-        surgical: [
-          "Angioplastia coronaria con colocación de stent en arteria descendente anterior"
-        ],
-        traumatic: ["Niega traumas recientes relevantes"],
-        pharmacological: [
-          "Losartán",
-          "Hidroclorotiazida de uso irregular",
-          "Atorvastatina",
-          "Ácido acetilsalicílico",
-          "Salbutamol a necesidad"
-        ],
-        allergies: ["Niega alergias medicamentosas conocidas"],
-        toxicological: [
-          "Exfumadora",
-          "Niega alcohol en exceso",
-          "Niega sustancias psicoactivas"
-        ],
-        gynecoObstetric: [
-          "Menopausia desde hace varios años",
-          "Niega sangrado genital actual"
-        ],
-        family: [
-          "Padre con hipertensión arterial",
-          "Madre con diabetes mellitus tipo 2"
-        ],
-        occupational: [
-          "Ama de casa",
-          "Oficios domésticos limitados por disnea"
-        ],
-        epidemiological: [
-          "Niega viajes recientes",
-          "Niega contacto con personas con infección respiratoria"
-        ]
-      },
-      reviewOfSystems: {
-        general:
-          "Cansancio progresivo. Niega fiebre. Refiere posible aumento de peso.",
-        cardiovascular:
-          "Disnea de esfuerzo, ortopnea, despertares nocturnos con ahogo y edema bilateral de tobillos.",
-        respiratory:
-          "Tos seca nocturna y disnea progresiva. Niega expectoración purulenta y hemoptisis.",
-        gastrointestinal:
-          "Niega dolor abdominal, vómito, diarrea o sangrado digestivo.",
-        genitourinary:
-          "Niega disuria. Orina más cuando toma el diurético.",
-        neurologic:
-          "Niega pérdida de fuerza, alteración del habla o pérdida de conciencia.",
-        musculoskeletal:
-          "Cansancio al esfuerzo, sin dolor articular agudo relevante.",
-        skin:
-          "Edema en tobillos. Niega lesiones cutáneas.",
-        endocrine:
-          "Diabetes mellitus tipo 2 conocida.",
-        psychiatric:
-          "Ansiedad relacionada con la falta de aire nocturna."
-      },
-      results: {
-        labs: [
-          "Hemograma sin leucocitosis marcada",
-          "Creatinina 1.1 mg/dL",
-          "Potasio 4.2 mEq/L",
-          "BNP elevado: 980 pg/mL",
-          "Glicemia 148 mg/dL"
-        ],
-        imaging: [
-          "Radiografía de tórax: cardiomegalia leve y signos de congestión pulmonar bibasal"
-        ],
-        complementaryStudies: [
-          "ECG: ritmo sinusal, signos de antecedente isquémico antiguo",
-          "Ecocardiograma: fracción de eyección moderadamente reducida"
-        ]
+      presentIllness: [
+        "Dolor súbito en flanco izquierdo.",
+        "Irradiación a ingle y testículo izquierdos.",
+        "No encuentra posición cómoda.",
+        "Náuseas y un vómito.",
+        "Orina rojiza u oscura.",
+        "Baja ingesta de agua por trabajo.",
+        "No fiebre, no trauma, no diarrea."
+      ],
+      pastHistory: [
+        "Sin enfermedad renal conocida.",
+        "Posible episodio similar leve hace años.",
+        "Familiar con antecedente de cálculos.",
+        "No anticoagulantes.",
+        "No cirugías urológicas.",
+        "No alergias conocidas."
+      ],
+      paraclinics: {
+        urinalysis: "Hematuria. Leucocitos ausentes o escasos. Nitritos negativos.",
+        creatinine: "Normal.",
+        ultrasound: "Posible hidronefrosis leve izquierda.",
+        ct: "Cálculo ureteral distal izquierdo pequeño si se solicita confirmación."
       }
     },
     physicalExam: {
+      general: "Paciente inquieto, adolorido, cambia de posición.",
       vitalSigns: {
-        bloodPressure: "146/86 mmHg",
-        heartRate: "96 lpm",
-        respiratoryRate: "22 rpm",
-        oxygenSaturation: "93%",
-        temperature: "36.7 °C"
+        bloodPressure: "128/78 mmHg",
+        heartRate: "102 lpm por dolor",
+        respiratoryRate: "18 rpm",
+        temperature: "36.7 °C",
+        oxygenSaturation: "98% al aire ambiente"
       },
-      general:
-        "Consciente, orientada, algo disneica al hablar frases largas.",
-      headAndNeck: {
-        jugularVenousDistension: "Ingurgitación yugular leve.",
-        hepatojugularReflux: "Reflujo hepatoyugular positivo."
-      },
-      cardiovascular: {
-        rhythm: "Rítmico.",
-        heartSounds: "Ruidos cardíacos rítmicos, con S3 audible.",
-        murmurs: "No se auscultan soplos evidentes.",
-        peripheralPulses: "Pulsos periféricos presentes.",
-        capillaryRefill: "Llenado capilar conservado."
-      },
-      respiratory: {
-        auscultation:
-          "Crepitantes bibasales, de predominio en bases pulmonares.",
-        addedSounds: "Crepitantes bibasales."
-      },
-      abdomen: {
-        palpation: "Blando, depresible, no doloroso.",
-        visceromegaly: "No se palpan visceromegalias.",
-        ascites: "No se aprecia ascitis."
-      },
-      extremities: {
-        edema: "Edema bilateral en miembros inferiores con fóvea +/++.",
-        pulses: "Pulsos presentes."
-      },
-      neurologic: {
-        mentalStatus: "Alerta y orientada.",
-        motor: "Fuerza conservada en las cuatro extremidades.",
-        reflexes: "Reflejos osteotendinosos simétricos.",
-        sensory: "Sensibilidad conservada.",
-        gait: "Marcha limitada por disnea."
-      },
-      skin: "Sin lesiones cutáneas agudas."
+      abdomen:
+        "Abdomen blando, sin defensa ni rebote. Dolor profundo en flanco izquierdo.",
+      renal: "Puño-percusión lumbar izquierda positiva.",
+      genital:
+        "Sin hallazgo escrotal agudo si se evalúa; el dolor es irradiado, no de inicio testicular.",
+      neurovascular: "Pulsos, fuerza y sensibilidad conservados."
     },
     evaluationChecklist: [
-      "Caracterizó disnea.",
-      "Preguntó ortopnea.",
-      "Preguntó disnea paroxística nocturna.",
-      "Preguntó edema.",
-      "Indagó antecedentes cardiovasculares.",
-      "Preguntó adherencia a medicamentos.",
-      "Solicitó signos vitales.",
-      "Exploró cuello, corazón, pulmones y extremidades."
+      "Caracterizó el dolor con ALICIA FREDUSA.",
+      "Exploró inicio súbito, localización e irradiación a ingle/testículo.",
+      "Preguntó por hematuria.",
+      "Preguntó por fiebre y escalofríos.",
+      "Preguntó por náuseas y vómito.",
+      "Preguntó por antecedentes de cálculos e hidratación.",
+      "Realizó o solicitó puño-percusión renal.",
+      "Exploró abdomen y signos peritoneales.",
+      "Consideró diferenciales como pielonefritis, torsión testicular, apendicitis, diverticulitis y lumbalgia."
     ]
   },
 
   {
     id: "case-2",
-    publicLabel: "Paciente 2",
+    publicLabel: "Paciente 02",
     publicSex: "Masculino",
     publicAge: 72,
     simulatedPerson: {
       fullName: "Álvaro Hernán Gómez Ramírez",
       age: 72,
       sex: "Masculino",
-      occupation: "Jubilado",
+      occupation: "Pensionado",
       personality:
-        "Paciente preocupado, frustrado por hablar raro. Puede responder con dificultad leve, pero entiende."
+        "Preocupado, algo frustrado por la dificultad para hablar. Colaborador si le dan tiempo."
     },
     hiddenAcademicObjective:
-      "Reconocer déficit neurológico focal agudo compatible con accidente cerebrovascular.",
-    mainComplaint: "Doctor, se me durmió este lado y hablo raro.",
+      "Evaluar semiología neurológica de déficit focal agudo: inicio súbito, lateralidad, lenguaje, fuerza, sensibilidad, pares craneales, reflejos y signos de alarma de ACV.",
+    mainComplaint:
+      "Desde esta mañana tengo la boca torcida y se me dificulta mover bien el lado derecho.",
     conversationBehavior: {
       baseline:
-        "Responde con frases cortas, algo lentas, como si le costara hablar.",
+        "Habla con cierta dificultad, responde corto y puede frustrarse si no le entienden.",
       ifEmpathic:
-        "Se tranquiliza y colabora mejor.",
+        "Se calma y permite explorar mejor inicio, lateralidad y síntomas neurológicos.",
       ifRudeOrDisorganized:
-        "Se frustra y responde poco.",
+        "Se angustia y responde menos porque le cuesta hablar.",
       ifTooManyQuestions:
-        "Se confunde y dice que le pregunten más despacio."
+        "Dice que no puede responder tantas cosas al tiempo y que le pregunten de a poquito."
     },
     importantNegatives: [
-      "Niega trauma.",
-      "Niega pérdida de conciencia.",
-      "Niega convulsiones.",
-      "Niega fiebre.",
-      "Niega dolor torácico.",
-      "Niega cefalea intensa tipo trueno."
+      "No trauma craneal",
+      "No fiebre",
+      "No convulsión",
+      "No pérdida de conciencia prolongada",
+      "No dolor torácico principal",
+      "No cefalea explosiva descrita"
     ],
     responseGuide: {
       topicAnswers: {
-        "inicio":
-          "Eso empezó de repente, hace como dos horas.",
-        "debilidad":
-          "Siento muy flojo este lado derecho, sobre todo el brazo.",
-        "habla":
-          "Me cuesta hablar bien, siento la lengua como enredada.",
-        "cara":
-          "Mi esposa me dijo que se me torció un poquito la boca.",
-        "dolor de cabeza":
-          "No doctor, dolor de cabeza fuerte no tengo.",
-        "trauma":
-          "No me caí ni me golpeé."
+        motivo:
+          "Me empezó la boca torcida y siento débil el lado derecho. También me cuesta hablar claro.",
+        inicio:
+          "Empezó esta mañana, de forma súbita. Mi familia se dio cuenta rápido.",
+        lenguaje:
+          "Me cuesta hablar claro, como si se me enredaran las palabras.",
+        fuerza:
+          "Siento más débil el brazo y la pierna derechos.",
+        sensibilidad:
+          "Siento raro el lado derecho, pero sobre todo es debilidad.",
+        vision:
+          "No he notado visión doble.",
+        cefalea:
+          "Dolor de cabeza fuerte, de esos explosivos, no.",
+        antecedentes:
+          "Tengo hipertensión y a veces no soy tan juicioso con los medicamentos.",
+        medicamentos:
+          "Tomo pastillas para la presión, pero no recuerdo bien los nombres.",
+        tiempo:
+          "Fue hoy en la mañana. Mi familia dice que antes estaba normal."
       }
     },
     hiddenHistory: {
+      diagnosis: "Accidente cerebrovascular agudo probable",
       identification: {
-        fullName: "Álvaro Hernán Gómez Ramírez",
-        documentId: "70.123.456",
-        bloodTypeRh: "A positivo (A+)",
-        age: 72,
-        sex: "Masculino",
-        genderIdentity: "Hombre cisgénero",
-        ethnicity: "Se autorreconoce como mestizo",
-        birthDate: "1954-04-10",
-        phone: "300 000 0002",
-        address: "Medellín, Antioquia",
-        socioeconomicStratum: "Estrato 3",
-        educationLevel: "Bachillerato incompleto",
-        residenceArea: "Residencia urbana",
-        insurance: "Nueva EPS simulada",
-        maritalStatus: "Casado",
-        occupation: "Jubilado",
-        placeOfBirth: "Medellín, Antioquia",
-        emergencyContact: "Esposa: Marta Ramírez, 300 000 0102",
-        dominantHand: "Diestro",
-        mainLanguage: "Español",
-        disability: "No refiere discapacidad previa conocida",
-        companion: "Acude acompañado por su esposa",
-        informantReliability:
-          "Información parcialmente confiable; la esposa complementa por la dificultad del habla"
+        document: "70.123.456",
+        rh: "A+"
       },
-      presentIllness:
-        "Inicio súbito hace aproximadamente dos horas de debilidad en hemicuerpo derecho, alteración del habla, adormecimiento en cara y brazo derechos y asimetría facial.",
-      history: {
-        pathological: [
-          "Hipertensión arterial",
-          "Diabetes mellitus tipo 2",
-          "Fibrilación auricular referida",
-          "Dislipidemia probable"
-        ],
-        surgical: ["Niega cirugías mayores recientes"],
-        traumatic: [
-          "Niega trauma craneoencefálico reciente",
-          "Niega caídas previas al inicio del cuadro"
-        ],
-        pharmacological: [
-          "Losartán",
-          "Metformina",
-          "Anticoagulante de nombre no recordado, con adherencia irregular"
-        ],
-        allergies: ["Niega alergias medicamentosas conocidas"],
-        toxicological: [
-          "Exfumador",
-          "Niega alcohol en exceso",
-          "Niega sustancias psicoactivas"
-        ],
-        family: [
-          "Padre con antecedente de evento cerebrovascular",
-          "Familia con hipertensión arterial"
-        ],
-        occupational: ["Jubilado", "Actividad física limitada"],
-        epidemiological: [
-          "Niega viajes recientes",
-          "Niega síntomas infecciosos recientes"
-        ]
-      },
-      reviewOfSystems: {
-        general: "Niega fiebre o malestar general previo importante.",
-        cardiovascular:
-          "Antecedente de ritmo cardíaco irregular. Niega dolor torácico actual.",
-        respiratory: "Niega disnea, tos o expectoración.",
-        gastrointestinal: "Niega vómito, dolor abdominal o sangrado digestivo.",
-        genitourinary: "Niega disuria.",
-        neurologic:
-          "Debilidad derecha, habla enredada, asimetría facial y adormecimiento derecho.",
-        musculoskeletal:
-          "Niega dolor articular o trauma. Limitación actual por debilidad.",
-        skin: "Sin lesiones cutáneas agudas.",
-        endocrine: "Diabetes mellitus tipo 2.",
-        psychiatric: "Ansioso y frustrado por dificultad para hablar."
-      },
-      results: {
-        labs: [
-          "Glucometría 128 mg/dL",
-          "Hemograma sin leucocitosis marcada",
-          "Creatinina 1.0 mg/dL",
-          "INR no terapéutico"
-        ],
-        imaging: [
-          "TAC simple de cráneo: sin hemorragia intracraneal evidente"
-        ],
-        complementaryStudies: [
-          "ECG: fibrilación auricular con respuesta ventricular moderada"
-        ]
-      }
+      presentIllness: [
+        "Inicio súbito de desviación facial derecha.",
+        "Dificultad para articular palabras.",
+        "Debilidad en hemicuerpo derecho.",
+        "Inicio en la mañana, con última vez normal antes del evento.",
+        "Sin trauma, sin convulsión, sin fiebre."
+      ],
+      pastHistory: [
+        "Hipertensión arterial.",
+        "Adherencia irregular al tratamiento.",
+        "Dislipidemia probable.",
+        "No anticoagulación conocida."
+      ]
     },
     physicalExam: {
+      general: "Consciente, alerta, colaborador, con disartria.",
       vitalSigns: {
-        bloodPressure: "164/92 mmHg",
-        heartRate: "112 lpm",
-        respiratoryRate: "18 rpm",
-        oxygenSaturation: "96%",
-        temperature: "36.6 °C"
-      },
-      general:
-        "Consciente, alerta, ansioso, con dificultad leve para articular palabras.",
-      mentalStatus: {
-        consciousness: "Alerta.",
-        orientation: "Orientado en persona y lugar.",
-        speech: "Disartria leve.",
-        comprehension: "Comprende órdenes simples."
-      },
-      headAndNeck: {
-        pupils: "Isocóricas y reactivas.",
-        facialSymmetry: "Asimetría facial derecha leve.",
-        visualFields: "Sin alteración evidente en confrontación."
-      },
-      cardiovascular: {
-        rhythm: "Irregular.",
-        heartSounds: "Ruidos cardíacos arrítmicos.",
-        murmurs: "Sin soplos evidentes."
-      },
-      respiratory: {
-        auscultation: "Murmullo vesicular conservado.",
-        addedSounds: "Sin ruidos agregados."
+        bloodPressure: "168/94 mmHg",
+        heartRate: "88 lpm",
+        respiratoryRate: "17 rpm",
+        temperature: "36.6 °C",
+        oxygenSaturation: "96% al aire ambiente"
       },
       neurologic: {
-        mentalStatus: "Alerta, con disartria leve.",
-        cranialNerves:
-          "Asimetría facial derecha leve. Pupilas isocóricas y reactivas.",
-        speech: "Disartria leve.",
-        motor: "Debilidad en hemicuerpo derecho.",
-        motorRightArm: "Fuerza 3/5.",
-        motorRightLeg: "Fuerza 4/5.",
-        motorLeftArm: "Fuerza 5/5.",
-        motorLeftLeg: "Fuerza 5/5.",
-        tone: "Tono ligeramente disminuido en lado derecho.",
-        reflexes: "Reflejos osteotendinosos aumentados en lado derecho.",
-        plantarResponse: "Babinski derecho positivo.",
-        sensory: "Hipoestesia leve en cara y brazo derechos.",
-        coordination: "Limitada por debilidad derecha.",
-        gait: "No se evalúa por seguridad.",
-        pronatorDrift: "Desviación pronadora derecha positiva."
+        mentalStatus: "Consciente y orientado.",
+        speech: "Disartria.",
+        cranialNerves: "Asimetría facial derecha central.",
+        motor: "Disminución de fuerza en miembro superior e inferior derechos.",
+        reflexes: "Hiperreflexia derecha.",
+        babinski: "Babinski derecho positivo.",
+        sensitivity: "Sensibilidad gruesa relativamente conservada o discretamente alterada del lado derecho.",
+        gait: "Marcha no segura por debilidad; requiere asistencia."
       },
-      abdomen: "Blando, no doloroso.",
-      extremities: "Sin edema. Pulsos presentes."
+      cardiovascular: "Ruidos cardíacos rítmicos, sin soplos evidentes.",
+      respiratory: "Sin dificultad respiratoria, murmullo vesicular conservado."
     },
     evaluationChecklist: [
-      "Identificó inicio súbito.",
-      "Preguntó hora de inicio.",
-      "Exploró déficit motor.",
-      "Exploró lenguaje.",
-      "Preguntó antecedentes cardiovasculares.",
-      "Preguntó anticoagulación.",
-      "Solicitó glucometría.",
-      "Solicitó examen neurológico dirigido.",
-      "Reconoció signos de alarma neurológica."
+      "Identificó inicio súbito y hora de inicio/última vez normal.",
+      "Exploró lenguaje y disartria.",
+      "Exploró asimetría facial.",
+      "Exploró fuerza por lateralidad.",
+      "Exploró sensibilidad.",
+      "Exploró pares craneales.",
+      "Solicitó reflejos y Babinski.",
+      "Preguntó por cefalea, convulsión, trauma y fiebre.",
+      "Reconoció cuadro compatible con ACV agudo."
     ]
   },
 
   {
-    id: "case-3",
-    publicLabel: "Paciente 3",
+    id: "case-11",
+    publicLabel: "Paciente 03",
     publicSex: "Femenino",
-    publicAge: 49,
+    publicAge: 29,
     simulatedPerson: {
-      fullName: "Marcela Andrea Ruiz Castaño",
-      age: 49,
+      fullName: "Natalia Andrea Pineda Salazar",
+      age: 29,
       sex: "Femenino",
-      occupation: "Auxiliar administrativa",
+      occupation: "Diseñadora gráfica",
       personality:
-        "Paciente colaboradora, preocupada porque el dolor limita actividades cotidianas."
+        "Preocupada, algo cansada, colaboradora. Se angustia cuando habla de la falta de aire."
     },
     hiddenAcademicObjective:
-      "Reconocer síndrome doloroso de hombro compatible con lesión o tendinopatía del manguito rotador.",
-    mainComplaint: "Doctor, me duele mucho el hombro.",
+      "Evaluar control del asma: síntomas diurnos, despertares nocturnos, limitación funcional, uso frecuente de SABA, adherencia al controlador, técnica inhalatoria, desencadenantes y signos de gravedad.",
+    mainComplaint:
+      "Llevo varias semanas con mucha silbadera en el pecho y usando mucho el inhalador.",
     conversationBehavior: {
       baseline:
-        "Responde de forma natural, describe dolor y limitación si le preguntan.",
+        "Habla frases completas, pero se nota preocupada porque los síntomas se repiten.",
       ifEmpathic:
-        "Coopera mejor y explica cómo afecta su vida diaria.",
+        "Explica con detalle el uso frecuente de salbutamol, despertares nocturnos y mala adherencia al controlador.",
       ifRudeOrDisorganized:
-        "Responde más corto y se muestra incómoda.",
+        "Se confunde entre inhalador de rescate y controlador.",
       ifTooManyQuestions:
-        "Dice que son muchas preguntas y pide ir por partes."
+        "Dice que se confunde con tantas preguntas y pide ir una por una."
     },
     importantNegatives: [
-      "Niega trauma fuerte.",
-      "Niega fiebre.",
-      "Niega pérdida de peso.",
-      "Niega deformidad.",
-      "Niega dolor torácico.",
-      "Niega hormigueo persistente.",
-      "Niega pérdida de fuerza distal en la mano."
+      "No fiebre alta",
+      "No expectoración purulenta abundante",
+      "No dolor torácico opresivo irradiado",
+      "No hemoptisis",
+      "No edema en miembros inferiores",
+      "No síncope",
+      "No incapacidad para hablar",
+      "No cianosis",
+      "No confusión"
     ],
     responseGuide: {
       topicAnswers: {
-        "dolor":
-          "Me duele en el hombro derecho, más hacia el ladito.",
-        "tiempo":
-          "Llevo como tres meses con eso.",
-        "movimiento":
-          "Me duele cuando levanto el brazo o cuando intento peinarme.",
-        "noche":
-          "Dormir sobre ese lado me molesta mucho.",
-        "trauma":
-          "No, no me caí ni me golpeé duro.",
-        "medicamentos":
-          "A veces tomo acetaminofén, y cuando me duele mucho, ibuprofeno."
+        motivo:
+          "Tengo mucha silbadera en el pecho y estoy usando mucho el inhalador azul.",
+        disnea:
+          "Me falta el aire sobre todo cuando subo escaleras, hago ejercicio o por la noche.",
+        tos: "Me da tos seca, más de noche.",
+        sibilancias:
+          "Sí, siento como una silbadera en el pecho.",
+        opresion:
+          "Siento el pecho apretado, pero no es un dolor como de infarto.",
+        nocturnos:
+          "Me despierto dos o tres veces por semana por tos o falta de aire.",
+        salbutamol:
+          "Lo estoy usando casi todos los días, a veces varias veces al día.",
+        controlador:
+          "Tengo otro inhalador, pero la verdad no lo uso juiciosa. A veces se me olvida.",
+        tecnica:
+          "No estoy segura de estar usándolo bien. A veces disparo y respiro después.",
+        desencadenantes:
+          "El polvo, el frío, los olores fuertes y cuando me da gripa me ponen peor.",
+        antecedentes:
+          "Tengo asma desde adolescente y rinitis alérgica.",
+        gravedad:
+          "No he estado en UCI ni me han intubado. Una vez fui a urgencias hace más de un año."
       }
     },
     hiddenHistory: {
-      identification: {
-        fullName: "Marcela Andrea Ruiz Castaño",
-        documentId: "43.890.127",
-        bloodTypeRh: "B positivo (B+)",
-        age: 49,
-        sex: "Femenino",
-        genderIdentity: "Mujer cisgénero",
-        ethnicity: "Se autorreconoce como mestiza",
-        birthDate: "1977-09-02",
-        phone: "300 000 0003",
-        address: "Medellín, Antioquia",
-        socioeconomicStratum: "Estrato 3",
-        educationLevel: "Técnico laboral",
-        residenceArea: "Residencia urbana",
-        insurance: "EPS simulada Sanitas",
-        maritalStatus: "Unión libre",
-        occupation: "Auxiliar administrativa",
-        placeOfBirth: "Itagüí, Antioquia",
-        emergencyContact: "Pareja: Andrés Castaño, 300 000 0103",
-        dominantHand: "Diestra",
-        mainLanguage: "Español",
-        disability: "No refiere discapacidad conocida",
-        companion: "Consulta sola",
-        informantReliability: "Información confiable"
+      diagnosis: "Asma crónica no controlada",
+      symptomCharacterization: {
+        dyspnea: "Variable, episódica, más con ejercicio y en la noche.",
+        cough: "Seca o escasa, más nocturna.",
+        wheezing: "Frecuente, descrita como silbadera.",
+        chestTightness: "Pecho apretado, no dolor coronario.",
+        triggers: ["Polvo", "frío", "olores fuertes", "ejercicio", "gripa"],
+        relievers: "Salbutamol con mejoría parcial.",
+        control:
+          "No controlada por síntomas frecuentes, despertares nocturnos, limitación de actividad y uso frecuente de rescate."
       },
-      presentIllness:
-        "Dolor de hombro derecho de tres meses de evolución, progresivo, en cara lateral del hombro. Empeora al elevar el brazo, peinarse, vestirse, cargar bolsas y dormir sobre ese lado.",
-      history: {
-        pathological: [
-          "Niega diabetes",
-          "Niega enfermedad tiroidea",
-          "Niega enfermedad reumatológica conocida"
-        ],
-        surgical: [
-          "Niega cirugías previas en hombro",
-          "Niega cirugías recientes"
-        ],
-        traumatic: [
-          "Niega trauma fuerte",
-          "Posible sobrecarga al cargar bolsas y hacer oficios"
-        ],
-        pharmacological: [
-          "Acetaminofén ocasional",
-          "Ibuprofeno ocasional"
-        ],
-        allergies: ["Niega alergias medicamentosas conocidas"],
-        toxicological: [
-          "Niega tabaquismo",
-          "Alcohol social ocasional",
-          "Niega sustancias psicoactivas"
-        ],
-        gynecoObstetric: [
-          "Ciclos irregulares ocasionales",
-          "Niega embarazo actual",
-          "Niega sangrado genital anormal"
-        ],
-        family: [
-          "Madre con artrosis",
-          "Niega familiares con enfermedades inflamatorias articulares"
-        ],
-        occupational: [
-          "Auxiliar administrativa",
-          "Trabajo prolongado en escritorio",
-          "Realiza oficios domésticos y carga bolsas"
-        ],
-        epidemiological: [
-          "Niega viajes recientes",
-          "Niega exposición infecciosa relevante"
-        ]
-      },
-      reviewOfSystems: {
-        general: "Niega fiebre, pérdida de peso o sudoración nocturna.",
-        cardiovascular: "Niega dolor torácico, palpitaciones o síncope.",
-        respiratory: "Niega tos, disnea o expectoración.",
-        gastrointestinal: "Niega dolor abdominal, vómito o diarrea.",
-        genitourinary: "Niega síntomas urinarios.",
-        neurologic:
-          "Niega adormecimiento, hormigueo o pérdida de fuerza distal en mano.",
-        musculoskeletal:
-          "Dolor de hombro derecho con limitación funcional.",
-        skin: "Niega enrojecimiento, calor local marcado o lesiones cutáneas.",
-        endocrine: "Niega diabetes y enfermedad tiroidea conocida.",
-        psychiatric:
-          "Preocupada por persistencia del dolor y limitación funcional."
-      },
-      results: {
-        labs: ["No se solicitan laboratorios de rutina inicialmente"],
-        imaging: [
-          "Radiografía de hombro: sin fractura ni luxación",
-          "Ecografía de hombro: tendinopatía del supraespinoso, sin ruptura completa evidente"
-        ],
-        complementaryStudies: [
-          "Evaluación funcional compatible con compromiso del manguito rotador"
-        ]
+      pastHistory: [
+        "Asma desde adolescencia.",
+        "Rinitis alérgica.",
+        "No intubación previa.",
+        "No UCI previa.",
+        "Una consulta a urgencias por asma hace más de un año.",
+        "No tabaquismo activo.",
+        "Alergia ambiental a polvo/ácaros."
+      ],
+      medications: [
+        "Salbutamol de rescate, uso casi diario.",
+        "Controlador inhalado, uso irregular."
+      ],
+      paraclinics: {
+        peakFlow: "Disminuido respecto al esperado o al mejor personal si se mide.",
+        spirometry:
+          "Espirometría previa con patrón obstructivo reversible si se pregunta.",
+        chestXray: "Sin consolidación si se solicita por duda.",
+        arterialGas: "No necesaria si está estable."
       }
     },
     physicalExam: {
+      general: "Consciente, orientada, habla frases completas, ansiosa leve.",
       vitalSigns: {
-        bloodPressure: "122/78 mmHg",
-        heartRate: "76 lpm",
-        respiratoryRate: "16 rpm",
-        oxygenSaturation: "98%",
-        temperature: "36.6 °C"
+        bloodPressure: "118/72 mmHg",
+        heartRate: "94 lpm",
+        respiratoryRate: "22 rpm",
+        temperature: "36.6 °C",
+        oxygenSaturation: "95-96% al aire ambiente"
       },
-      general: "Consciente, orientada, sin dificultad respiratoria.",
-      shoulder: {
-        inspection: "Sin deformidad evidente.",
-        palpation:
-          "Dolor a la palpación en región lateral del hombro derecho y zona subacromial.",
-        activeRangeOfMotion:
-          "Dolor al elevar el brazo por encima de 90 grados.",
-        passiveRangeOfMotion:
-          "Menos dolorosa que la movilidad activa, relativamente conservada.",
-        painfulArc: "Dolor entre 60 y 120 grados de abducción.",
-        strength:
-          "Disminución de fuerza por dolor en abducción y rotación externa.",
-        neer: "Prueba de Neer positiva.",
-        hawkins: "Prueba de Hawkins-Kennedy positiva.",
-        jobe: "Prueba de Jobe positiva por dolor y debilidad.",
-        dropArm: "Negativa.",
-        speed: "Negativa.",
-        yergason: "Negativa."
-      },
-      cervical:
-        "Movilidad cervical conservada. No reproduce claramente el dolor.",
-      neurovascularUpperLimb:
-        "Sensibilidad distal conservada, pulsos presentes, sin déficit motor distal claro.",
-      cardiovascular: "Ruidos cardíacos rítmicos, sin hallazgos relevantes.",
-      respiratory: "Campos pulmonares sin ruidos agregados.",
-      neurologic: {
-        motor: "Fuerza distal conservada.",
-        reflexes: "Reflejos simétricos.",
-        sensory: "Sensibilidad distal conservada."
-      }
+      respiratory:
+        "Sibilancias espiratorias difusas, espiración prolongada, sin crépitos focales.",
+      severity:
+        "Sin cianosis, sin confusión, sin incapacidad para hablar, sin tirajes severos.",
+      cardiovascular: "Rítmico, sin signos de falla cardiaca.",
+      extremities: "Sin edema periférico."
     },
     evaluationChecklist: [
-      "Caracterizó dolor de hombro.",
-      "Preguntó duración.",
-      "Preguntó limitación funcional.",
-      "Preguntó trauma.",
-      "Exploró movilidad activa y pasiva.",
-      "Realizó maniobras de manguito rotador.",
-      "Evaluó cuello y neurovascular distal.",
-      "Reconoció signos compatibles con manguito rotador."
+      "Exploró frecuencia de síntomas diurnos.",
+      "Exploró despertares nocturnos.",
+      "Exploró limitación de actividad.",
+      "Preguntó uso de salbutamol/rescate.",
+      "Preguntó uso de controlador.",
+      "Evaluó adherencia y técnica inhalatoria.",
+      "Identificó desencadenantes.",
+      "Preguntó antecedentes de crisis graves, UCI o intubación.",
+      "Exploró rinitis/alergias.",
+      "Solicitó auscultación pulmonar y saturación.",
+      "Buscó signos de gravedad."
     ]
   },
 
   {
     id: "case-4",
-    publicLabel: "Paciente 4",
+    publicLabel: "Paciente 04",
     publicSex: "Masculino",
     publicAge: 27,
     simulatedPerson: {
@@ -660,344 +419,486 @@ export const CASES: CaseData[] = [
       sex: "Masculino",
       occupation: "Mensajero",
       personality:
-        "Paciente joven, incómodo por el dolor abdominal, responde con preocupación y se queja al moverse."
+        "Adolorido, algo impaciente, pero colaborador. Protege el abdomen y responde mejor a preguntas concretas."
     },
     hiddenAcademicObjective:
-      "Reconocer dolor abdominal agudo compatible con apendicitis aguda.",
+      "Evaluar dolor abdominal agudo con ALICIA FREDUSA, migración del dolor, síntomas asociados y signos de irritación peritoneal compatibles con apendicitis.",
     mainComplaint:
-      "Doctor, tengo un dolor muy fuerte en el lado derecho del abdomen.",
+      "Me empezó un dolor en la barriga y ahora lo siento más fuerte abajo a la derecha.",
     conversationBehavior: {
       baseline:
-        "Responde con frases cortas porque está incómodo. Si le preguntan bien, describe la evolución del dolor.",
+        "Responde con cara de dolor. Evita moverse mucho porque el dolor empeora.",
       ifEmpathic:
-        "Coopera mejor y permite orientar la historia.",
+        "Describe mejor la migración del dolor, náuseas, vómito e hiporexia.",
       ifRudeOrDisorganized:
-        "Se desespera y dice que le duele mucho.",
+        "Se molesta porque moverse o hablar mucho le aumenta el dolor.",
       ifTooManyQuestions:
-        "Dice que le pregunten de a poquito porque el dolor no lo deja concentrarse."
+        "Dice que le duele y que le pregunten más despacio."
     },
     importantNegatives: [
-      "Niega diarrea.",
-      "Niega disuria.",
-      "Niega hematuria.",
-      "Niega trauma.",
-      "Niega dolor testicular.",
-      "Niega antecedentes quirúrgicos abdominales."
+      "No diarrea abundante",
+      "No síntomas urinarios claros",
+      "No dolor testicular",
+      "No trauma abdominal",
+      "No sangrado digestivo",
+      "No enfermedad inflamatoria intestinal conocida"
     ],
     responseGuide: {
       topicAnswers: {
-        "dolor":
-          "Me empezó alrededor del ombligo y ahora lo siento más abajo a la derecha.",
-        "inicio":
-          "Empezó ayer, hace como 18 horas.",
-        "vomito":
-          "Sí, he vomitado dos veces y tengo muchas náuseas.",
-        "apetito":
-          "No me provoca comer nada.",
-        "fiebre":
-          "Me he sentido caliente, como con fiebre.",
-        "diarrea":
-          "No doctor, diarrea no he tenido.",
-        "orina":
-          "No me arde para orinar ni he visto sangre."
+        motivo:
+          "Me duele la barriga, empezó como en el centro y ahora está más abajo a la derecha.",
+        aparicion:
+          "Empezó hace unas 18 horas.",
+        localizacion:
+          "Ahora me duele sobre todo abajo a la derecha.",
+        irradiacion:
+          "No se me va a otro lado, más bien empezó en el centro y se movió para la derecha.",
+        caracter:
+          "Es un dolor constante, fuerte, como profundo.",
+        intensidad:
+          "Está como en 8 de 10.",
+        agravantesAtenuantes:
+          "Me duele más al caminar, toser o cuando me tocan. Quieto mejora un poquito.",
+        frecuenciaDuracion:
+          "Ha sido constante desde que se pasó para la derecha.",
+        sintomasAsociados:
+          "Me han dado náuseas, vomité y no tengo ganas de comer. Me he sentido caliente.",
+        urinario:
+          "No, ardor para orinar no.",
+        digestivo:
+          "Diarrea fuerte no. Más bien no he querido comer.",
+        examenAbdomen:
+          "Me duele mucho en la parte baja derecha y cuando sueltan después de presionar duele más."
       }
     },
     hiddenHistory: {
+      diagnosis: "Apendicitis aguda",
       identification: {
-        fullName: "Javier Andrés Correa Gómez",
-        documentId: "1.037.456.219",
-        bloodTypeRh: "O positivo (O+)",
-        age: 27,
-        sex: "Masculino",
-        genderIdentity: "Hombre cisgénero",
-        ethnicity: "Se autorreconoce como mestizo",
-        birthDate: "1999-03-21",
-        phone: "300 000 0004",
-        address: "Medellín, Antioquia",
-        socioeconomicStratum: "Estrato 2",
-        educationLevel: "Bachillerato completo",
-        residenceArea: "Residencia urbana",
-        insurance: "EPS simulada Savia Salud",
-        maritalStatus: "Soltero",
-        occupation: "Mensajero",
-        placeOfBirth: "Medellín, Antioquia",
-        emergencyContact: "Madre: Luz Gómez, 300 000 0104",
-        dominantHand: "Diestro",
-        mainLanguage: "Español",
-        disability: "No refiere discapacidad conocida",
-        companion: "Acude acompañado por la madre",
-        informantReliability: "Información confiable"
+        document: "1.037.456.219",
+        rh: "O+"
       },
-      presentIllness:
-        "Dolor abdominal de 18 horas de evolución, inicialmente periumbilical y luego migrado a fosa ilíaca derecha. Progresivo, empeora al caminar y moverse. Asociado a náuseas, dos episodios de vómito, hiporexia y sensación febril.",
-      history: {
-        pathological: [
-          "Niega hipertensión",
-          "Niega diabetes",
-          "Niega enfermedad gastrointestinal previa"
-        ],
-        surgical: ["Niega cirugías previas"],
-        traumatic: ["Niega trauma reciente"],
-        pharmacological: ["Acetaminofén ocasional"],
-        allergies: ["Niega alergias medicamentosas conocidas"],
-        toxicological: [
-          "Alcohol social ocasional",
-          "Niega tabaquismo",
-          "Niega sustancias psicoactivas"
-        ],
-        family: ["Padre con hipertensión arterial"],
-        occupational: ["Mensajero, pasa gran parte del día en moto"],
-        epidemiological: [
-          "Niega viajes recientes",
-          "Niega consumo de alimentos en mal estado claramente identificado"
-        ]
+      aliciaFredusa: {
+        aparicion: "18 horas de evolución.",
+        localizacion: "Inició periumbilical y migró a fosa iliaca derecha.",
+        irradiacion: "Migración del dolor; no irradiación clásica.",
+        caracter: "Dolor constante, profundo.",
+        intensidad: "8/10.",
+        atenuantesAgravantes:
+          "Empeora con marcha, tos, movimiento y palpación. Mejora poco con quietud.",
+        frecuencia: "Constante.",
+        duracion: "Persistente desde la migración.",
+        sintomasAsociados: "Náuseas, vómito, hiporexia, febrícula/fiebre."
       },
-      reviewOfSystems: {
-        general: "Sensación febril, malestar e hiporexia.",
-        cardiovascular: "Niega dolor torácico o palpitaciones.",
-        respiratory: "Niega tos o disnea.",
-        gastrointestinal:
-          "Dolor abdominal migratorio, náuseas, vómito e hiporexia. Niega diarrea.",
-        genitourinary:
-          "Niega disuria, hematuria o dolor testicular.",
-        neurologic: "Niega pérdida de conciencia o convulsiones.",
-        musculoskeletal: "Dolor aumenta con la marcha por el movimiento abdominal.",
-        skin: "Niega lesiones cutáneas.",
-        endocrine: "Niega diabetes.",
-        psychiatric: "Ansioso por el dolor."
-      },
-      results: {
-        labs: [
-          "Leucocitos 15.200",
-          "Neutrofilia",
-          "PCR elevada"
-        ],
-        imaging: [
-          "Ecografía abdominal compatible con apendicitis aguda"
-        ],
-        complementaryStudies: [
-          "Parcial de orina sin datos sugestivos de infección urinaria"
-        ]
+      presentIllness: [
+        "Dolor abdominal de 18 horas.",
+        "Inicio periumbilical.",
+        "Migración a fosa iliaca derecha.",
+        "Náuseas, vómito, hiporexia.",
+        "Sensación febril."
+      ],
+      paraclinics: {
+        cbc: "Leucocitos 15.200 con neutrofilia.",
+        crp: "Elevada.",
+        ultrasound: "Hallazgos sugestivos de apendicitis."
       }
     },
     physicalExam: {
+      general: "Paciente con facies de dolor, evita moverse.",
       vitalSigns: {
-        bloodPressure: "118/72 mmHg",
+        bloodPressure: "122/76 mmHg",
         heartRate: "102 lpm",
-        respiratoryRate: "20 rpm",
-        oxygenSaturation: "98%",
-        temperature: "38.1 °C"
+        respiratoryRate: "19 rpm",
+        temperature: "38.1 °C",
+        oxygenSaturation: "98% al aire ambiente"
       },
-      general: "Paciente incómodo, camina lento por dolor.",
-      abdomen: {
-        inspection: "Sin distensión marcada.",
-        auscultation: "Ruidos intestinales presentes.",
-        palpation: "Dolor en fosa ilíaca derecha.",
-        guarding: "Defensa localizada en fosa ilíaca derecha.",
-        rebound: "Blumberg positivo.",
-        mcburney: "McBurney positivo.",
-        rovsing: "Rovsing positivo.",
-        psoas: "Psoas positivo leve.",
-        obturator: "Obturador negativo.",
-        masses: "No se palpan masas."
-      },
-      genitourinary: "Sin dolor testicular referido.",
-      cardiovascular: "Taquicardia leve, sin soplos.",
-      respiratory: "Campos pulmonares sin ruidos agregados.",
-      neurologic: "Sin déficit neurológico focal."
+      abdomen:
+        "Dolor en fosa iliaca derecha, McBurney positivo, Blumberg positivo, Rovsing positivo, psoas levemente positivo, defensa localizada.",
+      bowelSounds: "Ruidos intestinales presentes.",
+      peritonitis: "Sin peritonitis generalizada.",
+      genitourinary: "Sin dolor testicular, sin síntomas urinarios claros."
     },
     evaluationChecklist: [
-      "Caracterizó inicio del dolor.",
-      "Preguntó migración del dolor.",
-      "Preguntó náuseas y vómito.",
-      "Preguntó fiebre e hiporexia.",
-      "Descartó diarrea y síntomas urinarios.",
-      "Exploró abdomen.",
-      "Buscó signos de irritación peritoneal.",
-      "Reconoció abdomen agudo inflamatorio."
+      "Caracterizó dolor abdominal con ALICIA FREDUSA.",
+      "Identificó migración del dolor.",
+      "Preguntó náuseas, vómito e hiporexia.",
+      "Preguntó fiebre.",
+      "Descartó síntomas urinarios y testiculares.",
+      "Solicitó palpación abdominal dirigida.",
+      "Exploró McBurney, Blumberg, Rovsing y psoas.",
+      "Reconoció signos de irritación peritoneal localizada.",
+      "Consideró apendicitis como diagnóstico probable."
     ]
   },
 
   {
-    id: "case-5",
-    publicLabel: "Paciente 5",
+    id: "case-7",
+    publicLabel: "Paciente 05",
     publicSex: "Masculino",
-    publicAge: 58,
+    publicAge: 24,
     simulatedPerson: {
-      fullName: "Carlos Alberto Londoño Ruiz",
-      age: 58,
+      fullName: "Juan Sebastián Ríos Castañeda",
+      age: 24,
       sex: "Masculino",
-      occupation: "Conductor de taxi",
+      occupation: "Estudiante universitario y futbolista recreativo",
       personality:
-        "Paciente ansioso, asustado por el dolor en el pecho, responde con preocupación."
+        "Ansioso, preocupado por volver a jugar, colaborador. Quiere saber si la rodilla está grave."
     },
     hiddenAcademicObjective:
-      "Reconocer dolor torácico sugestivo de síndrome coronario agudo.",
+      "Evaluar trauma deportivo de rodilla usando ALICIA FREDUSA, mecanismo rotacional, pop, derrame agudo, inestabilidad, apoyo y maniobras de LCA.",
     mainComplaint:
-      "Tengo un dolor muy fuerte en el pecho desde hace rato.",
+      "Me lesioné la rodilla jugando fútbol y siento que se me va.",
     conversationBehavior: {
       baseline:
-        "Responde preocupado, con frases cortas. Quiere saber si es algo grave.",
+        "Está preocupado por volver a jugar. Describe bien el mecanismo si se le pregunta.",
       ifEmpathic:
-        "Se calma un poco y describe mejor el dolor.",
+        "Colabora mejor y permite explorar mecanismo, derrame e inestabilidad.",
       ifRudeOrDisorganized:
-        "Se angustia y se irrita.",
+        "Se frustra porque siente que no le están entendiendo la gravedad de la rodilla.",
       ifTooManyQuestions:
-        "Dice que no puede responder tantas cosas al tiempo porque le duele el pecho."
+        "Dice que fueron muchas preguntas y que mejor le pregunten de a una."
     },
     importantNegatives: [
-      "Niega trauma.",
-      "Niega dolor que cambie con palpación.",
-      "Niega fiebre.",
-      "Niega tos productiva.",
-      "Niega síncope.",
-      "Niega consumo reciente de cocaína."
+      "No fiebre",
+      "No herida abierta",
+      "No deformidad severa",
+      "No frialdad distal",
+      "No pérdida de sensibilidad",
+      "No dolor predominante en cadera o tobillo",
+      "No bloqueo articular franco persistente"
     ],
     responseGuide: {
       topicAnswers: {
-        "dolor":
-          "Es una presión fuerte en el centro del pecho.",
-        "inicio":
-          "Empezó hace como una hora.",
-        "irradiacion":
-          "Se me va para el brazo izquierdo y como hacia la mandíbula.",
-        "sudor":
-          "Sí doctor, estoy sudando frío.",
-        "nauseas":
-          "Sí, me han dado náuseas.",
-        "reposo":
-          "Me quedé quieto, pero no se me quitó del todo.",
-        "fumador":
-          "Sí, fumo desde hace muchos años."
+        motivo:
+          "Me torcí la rodilla jugando fútbol y desde ahí siento que se me va.",
+        mecanismo:
+          "Iba a cambiar de dirección, giré con el pie apoyado y sentí que la rodilla se me fue.",
+        pop: "Sí, sentí como un pop o un chasquido por dentro.",
+        aparicion:
+          "Fue ayer durante el partido.",
+        localizacion:
+          "Me duele en la rodilla derecha, más profundo y algo hacia la parte interna.",
+        irradiacion:
+          "No se me va para otro lado, es en la rodilla.",
+        caracter:
+          "Al principio fue un dolor agudo; ahora es dolor con presión por la inflamación.",
+        intensidad:
+          "Fue 7 de 10 al principio, ahora está como 5 o 6, pero sube si apoyo o giro.",
+        agravantesAtenuantes:
+          "Mejora con hielo y reposo. Empeora al apoyar, girar o bajar escaleras.",
+        frecuenciaDuracion:
+          "Desde el golpe no se me ha quitado. Es constante suave y se pone más fuerte con movimiento.",
+        sintomasAsociados:
+          "Se me inflamó rápido y siento que la rodilla me falla.",
+        apoyo:
+          "Puedo apoyar, pero con dolor y miedo a que se me vaya.",
+        deporte:
+          "No pude seguir jugando después de eso."
       }
     },
     hiddenHistory: {
-      identification: {
-        fullName: "Carlos Alberto Londoño Ruiz",
-        documentId: "71.456.982",
-        bloodTypeRh: "A positivo (A+)",
-        age: 58,
-        sex: "Masculino",
-        genderIdentity: "Hombre cisgénero",
-        ethnicity: "Se autorreconoce como mestizo",
-        birthDate: "1968-08-12",
-        phone: "300 000 0005",
-        address: "Bello, Antioquia",
-        socioeconomicStratum: "Estrato 3",
-        educationLevel: "Bachillerato completo",
-        residenceArea: "Residencia urbana",
-        insurance: "EPS simulada Salud Total",
-        maritalStatus: "Casado",
-        occupation: "Conductor de taxi",
-        placeOfBirth: "Bello, Antioquia",
-        emergencyContact: "Esposa: Patricia Ruiz, 300 000 0105",
-        dominantHand: "Diestro",
-        mainLanguage: "Español",
-        disability: "No refiere discapacidad conocida",
-        companion: "Acude solo",
-        informantReliability: "Información confiable"
+      diagnosis: "Rotura de ligamento cruzado anterior derecho",
+      aliciaFredusa: {
+        aparicion: "Hace 1 día durante partido de fútbol.",
+        localizacion: "Rodilla derecha, profunda, algo interna.",
+        irradiacion: "No irradia claramente.",
+        caracter: "Dolor agudo inicial, presión posterior por inflamación.",
+        intensidad: "7/10 inicial, 5-6/10 actual.",
+        atenuantesAgravantes:
+          "Mejora con reposo/hielo. Empeora con apoyo, giro, escaleras.",
+        frecuencia: "Continuo leve con exacerbaciones.",
+        duracion: "Persistente desde el trauma.",
+        sintomasAsociados:
+          "Inflamación rápida, inestabilidad, dificultad para apoyar, no pudo seguir jugando."
       },
-      presentIllness:
-        "Dolor torácico retroesternal opresivo de una hora de evolución, intensidad 8/10, irradiado a brazo izquierdo y mandíbula, asociado a diaforesis, náuseas y disnea. No mejora completamente con reposo.",
-      history: {
-        pathological: [
-          "Hipertensión arterial",
-          "Diabetes mellitus tipo 2",
-          "Dislipidemia"
-        ],
-        surgical: ["Niega cirugías cardíacas previas"],
-        traumatic: ["Niega trauma torácico"],
-        pharmacological: [
-          "Losartán",
-          "Metformina",
-          "Atorvastatina de uso irregular"
-        ],
-        allergies: ["Niega alergias medicamentosas conocidas"],
-        toxicological: [
-          "Fumador activo de larga data",
-          "Alcohol social ocasional",
-          "Niega consumo de cocaína u otras sustancias"
-        ],
-        family: [
-          "Padre falleció por infarto",
-          "Madre hipertensa"
-        ],
-        occupational: [
-          "Conductor de taxi",
-          "Sedentarismo por largas jornadas laborales"
-        ],
-        epidemiological: [
-          "Niega fiebre o síntomas respiratorios infecciosos recientes"
-        ]
-      },
-      reviewOfSystems: {
-        general: "Diaforesis y ansiedad.",
-        cardiovascular:
-          "Dolor torácico opresivo, irradiado a brazo izquierdo y mandíbula.",
-        respiratory: "Sensación de falta de aire.",
-        gastrointestinal: "Náuseas, sin vómito claro.",
-        genitourinary: "Niega síntomas urinarios.",
-        neurologic: "Niega pérdida de conciencia o déficit focal.",
-        musculoskeletal:
-          "Dolor no se reproduce claramente con palpación o movimiento.",
-        skin: "Sudoración fría.",
-        endocrine: "Diabetes mellitus tipo 2.",
-        psychiatric: "Ansioso por el dolor torácico."
-      },
-      results: {
-        labs: [
-          "Troponina elevada",
-          "Glicemia elevada",
-          "Creatinina 1.0 mg/dL"
-        ],
-        imaging: [
-          "Radiografía de tórax sin hallazgos agudos evidentes"
-        ],
-        complementaryStudies: [
-          "ECG: elevación del ST en cara inferior"
-        ]
+      presentIllness: [
+        "Cambio brusco de dirección jugando fútbol.",
+        "Sensación de que la rodilla se fue.",
+        "Pop audible o sentido.",
+        "Derrame en primeras horas.",
+        "Sensación de inestabilidad.",
+        "No herida abierta."
+      ],
+      pastHistory: [
+        "Sin cirugías de rodilla.",
+        "Sin enfermedades crónicas.",
+        "No anticoagulantes.",
+        "No alergias conocidas.",
+        "Fútbol recreativo 2-3 veces por semana."
+      ],
+      paraclinics: {
+        xray: "Sin fractura evidente.",
+        mri: "Ruptura de LCA derecho; posible edema óseo asociado."
       }
     },
     physicalExam: {
-      vitalSigns: {
-        bloodPressure: "154/92 mmHg",
-        heartRate: "108 lpm",
-        respiratoryRate: "24 rpm",
-        oxygenSaturation: "95%",
-        temperature: "36.7 °C"
-      },
-      general: "Paciente ansioso, diaforético, con dolor.",
-      cardiovascular: {
-        rhythm: "Rítmico, taquicárdico.",
-        heartSounds: "Ruidos cardíacos rítmicos.",
-        murmurs: "Sin soplos evidentes.",
-        peripheralPulses: "Pulsos presentes."
-      },
-      respiratory: {
-        auscultation: "Murmullo vesicular conservado.",
-        addedSounds: "Sin sibilancias ni crépitos."
-      },
-      chestWall:
-        "El dolor no se reproduce claramente con la palpación de la pared torácica.",
-      abdomen: "Blando, no doloroso.",
-      neurologic: "Sin déficit neurológico focal."
+      general: "Estado general conservado, dolor localizado en rodilla.",
+      gait: "Marcha antálgica.",
+      knee: {
+        inspection: "Rodilla derecha con aumento de volumen.",
+        effusion: "Derrame articular.",
+        palpation: "Dolor periarticular.",
+        rangeOfMotion: "Limitado por dolor.",
+        lachman: "Positivo.",
+        anteriorDrawer: "Positivo o sugestivo.",
+        pivotShift: "Difícil por dolor, pero sugestivo si se logra.",
+        varusValgus: "Sin bostezo marcado.",
+        neurovascular: "Pulsos, sensibilidad y llenado capilar conservados."
+      }
     },
     evaluationChecklist: [
-      "Caracterizó dolor torácico.",
-      "Preguntó irradiación.",
-      "Preguntó duración e inicio.",
-      "Preguntó diaforesis, náuseas y disnea.",
-      "Indagó factores de riesgo cardiovascular.",
-      "Preguntó tabaquismo.",
-      "Solicitó signos vitales.",
-      "Solicitó ECG y troponinas.",
-      "Reconoció signos de alarma."
+      "Caracterizó dolor con ALICIA FREDUSA.",
+      "Exploró mecanismo de lesión.",
+      "Preguntó por pop.",
+      "Preguntó aparición rápida de derrame.",
+      "Preguntó capacidad de continuar jugando.",
+      "Preguntó apoyo e inestabilidad.",
+      "Inspeccionó derrame.",
+      "Solicitó rango de movilidad.",
+      "Solicitó Lachman.",
+      "Solicitó cajón anterior.",
+      "Consideró pivot shift si procede.",
+      "Evaluó estabilidad varo/valgo.",
+      "Evaluó neurovascular distal."
+    ]
+  },
+
+  {
+    id: "case-1",
+    publicLabel: "Paciente 06",
+    publicSex: "Femenino",
+    publicAge: 68,
+    simulatedPerson: {
+      fullName: "Gloria Cecilia Restrepo Álvarez",
+      age: 68,
+      sex: "Femenino",
+      occupation: "Ama de casa",
+      personality:
+        "Amable, algo cansada, habla despacio por la disnea. Colabora si le preguntan con calma."
+    },
+    hiddenAcademicObjective:
+      "Evaluar síndrome congestivo compatible con falla cardiaca: disnea progresiva, ortopnea, disnea paroxística nocturna, edema, ingurgitación yugular, crépitos y tercer ruido.",
+    mainComplaint:
+      "Me falta el aire y se me están hinchando las piernas.",
+    conversationBehavior: {
+      baseline:
+        "Se muestra cansada y preocupada por la falta de aire. Responde con frases cortas.",
+      ifEmpathic:
+        "Explica mejor la ortopnea, edema y limitación funcional.",
+      ifRudeOrDisorganized:
+        "Se confunde y responde solo que le falta el aire.",
+      ifTooManyQuestions:
+        "Dice que son muchas preguntas y que se cansa hablando."
+    },
+    importantNegatives: [
+      "No fiebre",
+      "No expectoración purulenta",
+      "No dolor torácico opresivo actual",
+      "No hemoptisis",
+      "No síncope",
+      "No síntomas neurológicos focales"
+    ],
+    responseGuide: {
+      topicAnswers: {
+        motivo:
+          "Me falta el aire, sobre todo al caminar y al acostarme, y tengo las piernas hinchadas.",
+        disnea:
+          "Antes caminaba más, ahora me canso con pocas cuadras o subiendo escaleras.",
+        ortopnea:
+          "Tengo que dormir con dos o tres almohadas porque acostada me ahogo.",
+        dpn: "A veces me despierto en la noche con falta de aire.",
+        edema:
+          "Se me hinchan los tobillos y las piernas, más por la tarde.",
+        tos: "Tos con flema no. A veces toso seco.",
+        dolorToracico:
+          "Dolor fuerte en el pecho ahora no.",
+        antecedentes:
+          "Tengo presión alta desde hace años.",
+        medicamentos:
+          "Tomo pastillas para la presión, pero a veces se me olvidan.",
+        examen:
+          "Me encuentran las piernas hinchadas y ruidos en los pulmones abajo."
+      }
+    },
+    hiddenHistory: {
+      diagnosis: "Falla cardiaca descompensada / síndrome congestivo",
+      identification: {
+        document: "43.568.291",
+        rh: "O+"
+      },
+      presentIllness: [
+        "Disnea progresiva de varias semanas.",
+        "Ortopnea de 2-3 almohadas.",
+        "Disnea paroxística nocturna ocasional.",
+        "Edema bilateral en miembros inferiores.",
+        "Fatiga y menor tolerancia al ejercicio."
+      ],
+      pastHistory: [
+        "Hipertensión arterial de larga data.",
+        "Adherencia irregular a tratamiento.",
+        "Sin fiebre ni cuadro infeccioso respiratorio claro."
+      ]
+    },
+    physicalExam: {
+      general: "Paciente consciente, orientada, cansada, con disnea leve al hablar.",
+      vitalSigns: {
+        bloodPressure: "158/92 mmHg",
+        heartRate: "96 lpm",
+        respiratoryRate: "22 rpm",
+        temperature: "36.7 °C",
+        oxygenSaturation: "93% al aire ambiente"
+      },
+      neck: "Ingurgitación yugular presente.",
+      cardiovascular: "Ruidos rítmicos, tercer ruido S3 audible.",
+      respiratory: "Crépitos bibasales.",
+      extremities: "Edema bilateral en miembros inferiores con fóvea.",
+      neurologic: "Sin déficit focal."
+    },
+    evaluationChecklist: [
+      "Exploró disnea y clase funcional.",
+      "Preguntó ortopnea.",
+      "Preguntó disnea paroxística nocturna.",
+      "Preguntó edema.",
+      "Preguntó antecedentes cardiovasculares e hipertensión.",
+      "Preguntó adherencia a medicamentos.",
+      "Solicitó yugulares.",
+      "Solicitó auscultación pulmonar.",
+      "Solicitó auscultación cardíaca.",
+      "Evaluó edema con fóvea.",
+      "Reconoció síndrome congestivo."
+    ]
+  },
+  {
+    id: "case-12",
+    publicLabel: "Paciente 07",
+    publicSex: "Femenino",
+    publicAge: 56,
+    simulatedPerson: {
+      fullName: "Beatriz Elena Arango Mejía",
+      age: 56,
+      sex: "Femenino",
+      occupation: "Comerciante independiente",
+      personality:
+        "Temerosa de caerse, describe muy bien que todo le da vueltas. Colaboradora si le preguntan con calma."
+    },
+    hiddenAcademicObjective:
+      "Evaluar vértigo verdadero, duración, desencadenantes posicionales, nistagmo, Dix-Hallpike y descarte de banderas rojas centrales.",
+    mainComplaint:
+      "Me da vueltas todo cuando giro la cabeza o me levanto.",
+    conversationBehavior: {
+      baseline:
+        "Describe sensación de giro y miedo a caerse. Contesta bien si le preguntan por duración y desencadenantes.",
+      ifEmpathic:
+        "Explica con más claridad que los episodios son breves y posicionales.",
+      ifRudeOrDisorganized:
+        "Se angustia y mezcla mareo con miedo a caerse.",
+      ifTooManyQuestions:
+        "Dice que se marea solo de hablar de tantas cosas y pide ir despacio."
+    },
+    importantNegatives: [
+      "No debilidad",
+      "No alteración del habla",
+      "No diplopía",
+      "No cefalea súbita intensa",
+      "No pérdida auditiva súbita",
+      "No ataxia severa",
+      "No síncope",
+      "No dolor torácico",
+      "No palpitaciones sostenidas",
+      "No fiebre"
+    ],
+    responseGuide: {
+      topicAnswers: {
+        motivo:
+          "Me da vueltas todo cuando giro la cabeza, me levanto o me volteo en la cama.",
+        tipo:
+          "Es como si todo me diera vueltas, no es solo debilidad.",
+        inicio:
+          "Empezó hace tres días.",
+        duracion:
+          "Dura poquito, segundos, menos de un minuto, pero me asusta mucho.",
+        desencadenantes:
+          "Me pasa al girarme en la cama, al levantarme o al mirar hacia arriba.",
+        nausea:
+          "Sí, me dan náuseas cuando me da la vuelta.",
+        audicion:
+          "No he perdido la audición de repente. Zumbido fuerte tampoco.",
+        neurologico:
+          "No se me ha torcido la boca, no he perdido fuerza, no veo doble y no se me enreda la lengua.",
+        cefalea:
+          "Dolor de cabeza súbito y terrible no.",
+        marcha:
+          "Camino con miedo cuando me pasa, pero no es que me vaya de lado todo el tiempo.",
+        dixHallpike:
+          "Cuando me acuestan y me giran la cabeza, se reproduce el mareo y aparece un movimiento de los ojos."
+      }
+    },
+    hiddenHistory: {
+      diagnosis: "Vértigo posicional paroxístico benigno probable",
+      objective:
+        "Diferenciar vértigo periférico de banderas rojas centrales.",
+      vertigoCharacterization: {
+        type: "Vértigo verdadero, sensación de giro.",
+        onset: "Hace 3 días.",
+        duration: "Segundos a menos de un minuto.",
+        triggers: "Girarse en cama, levantarse, mirar hacia arriba.",
+        associatedSymptoms: "Náuseas, inseguridad al caminar durante el episodio.",
+        auditorySymptoms: "Niega hipoacusia súbita; tinnitus ausente o mínimo.",
+        centralRedFlags:
+          "No diplopía, no disartria, no debilidad, no ataxia severa, no cefalea explosiva."
+      },
+      pastHistory: [
+        "Episodio similar leve hace meses.",
+        "No ACV previo.",
+        "No migraña vestibular conocida.",
+        "No trauma craneal reciente.",
+        "No infección ótica marcada.",
+        "No consumo de alcohol reciente."
+      ],
+      paraclinics: {
+        imaging:
+          "No requiere imagen si cuadro típico y sin banderas rojas. Neuroimagen si hay signos centrales, déficit, cefalea intensa nueva, ataxia marcada o curso atípico.",
+        audiometry:
+          "Solo si hay síntomas auditivos relevantes."
+      }
+    },
+    physicalExam: {
+      general: "Consciente, orientada, temerosa de moverse rápido.",
+      vitalSigns: {
+        bloodPressure: "132/78 mmHg",
+        heartRate: "78 lpm",
+        respiratoryRate: "16 rpm",
+        temperature: "36.5 °C",
+        oxygenSaturation: "98% al aire ambiente"
+      },
+      neurologic:
+        "Pares craneales sin déficit, fuerza conservada, sensibilidad conservada, coordinación conservada.",
+      gait: "Marcha cautelosa, sin ataxia franca.",
+      romberg: "Negativo o con inseguridad leve.",
+      dixHallpike:
+        "Positivo hacia un lado: reproduce vértigo y nistagmo posicional.",
+      nystagmus:
+        "Nistagmo compatible con periférico: posicional, con latencia y fatigable.",
+      otoscopy: "Sin hallazgos agudos relevantes."
+    },
+    evaluationChecklist: [
+      "Diferenció vértigo verdadero de mareo inespecífico.",
+      "Preguntó duración de episodios.",
+      "Exploró desencadenantes posicionales.",
+      "Preguntó náuseas y vómito.",
+      "Preguntó síntomas auditivos.",
+      "Buscó síntomas neurológicos centrales.",
+      "Preguntó cefalea, síncope y caídas.",
+      "Evaluó marcha.",
+      "Solicitó pares craneales, fuerza, sensibilidad y coordinación.",
+      "Evaluó nistagmo.",
+      "Solicitó Dix-Hallpike.",
+      "Consideró VPPB y diferenciales centrales."
     ]
   },
 
   {
     id: "case-6",
-    publicLabel: "Paciente 6",
+    publicLabel: "Paciente 08",
     publicSex: "Femenino",
     publicAge: 64,
     simulatedPerson: {
@@ -1006,173 +907,611 @@ export const CASES: CaseData[] = [
       sex: "Femenino",
       occupation: "Vendedora informal",
       personality:
-        "Paciente cansada, con tos, algo agitada, preocupada porque le falta el aire."
+        "Cansada, algo disneica, pero amable. Responde mejor si le dan tiempo."
     },
     hiddenAcademicObjective:
-      "Reconocer síndrome febril respiratorio compatible con neumonía adquirida en la comunidad.",
-    mainComplaint: "Tengo mucha tos y me falta el aire.",
+      "Evaluar síndrome respiratorio infeccioso bajo: tos, expectoración, fiebre, dolor pleurítico, disnea, saturación y hallazgos de consolidación.",
+    mainComplaint:
+      "Tengo tos, fiebre y me duele el pecho al respirar.",
     conversationBehavior: {
       baseline:
-        "Responde con pausas porque tose y se cansa. Describe síntomas si le preguntan.",
+        "Habla con cansancio y tos ocasional. Describe expectoración y fiebre si le preguntan.",
       ifEmpathic:
-        "Coopera mejor y se siente acompañada.",
+        "Colabora mejor y cuenta evolución, color del esputo y dolor pleurítico.",
       ifRudeOrDisorganized:
-        "Se cansa y responde muy poco.",
+        "Se limita a decir que tiene tos y se siente muy cansada.",
       ifTooManyQuestions:
-        "Dice que se ahoga y pide que le pregunten más despacio."
+        "Dice que se cansa y que le pregunten de a poquito."
     },
     importantNegatives: [
-      "Niega dolor torácico opresivo.",
-      "Niega hemoptisis.",
-      "Niega pérdida de conciencia.",
-      "Niega edema en piernas.",
-      "Niega contacto claro con tuberculosis.",
-      "Niega viaje reciente."
+      "No hemoptisis",
+      "No dolor torácico opresivo irradiado",
+      "No edema de miembros inferiores",
+      "No síncope",
+      "No síntomas neurológicos",
+      "No antecedente claro de trombosis"
     ],
     responseGuide: {
       topicAnswers: {
-        "tos":
-          "Empezó seca, pero ahora boto flema amarilla.",
-        "fiebre":
+        motivo:
+          "Tengo tos con flema, fiebre y dolor en el pecho cuando respiro profundo.",
+        tos: "Empecé con tos seca y luego con flema amarillenta.",
+        fiebre:
           "Me he sentido con fiebre y escalofríos.",
-        "aire":
-          "Me falta el aire, sobre todo cuando camino o hablo mucho.",
-        "dolor":
-          "Me duele el pecho cuando respiro profundo o cuando toso.",
-        "flema":
-          "La flema es amarillenta.",
-        "cigarrillo":
-          "Fumé antes, pero ya no fumo."
+        disnea:
+          "Me falta el aire al caminar y me siento muy cansada.",
+        dolor:
+          "Me duele más cuando respiro profundo o toso, como una punzada.",
+        expectoracion:
+          "La flema es amarilla.",
+        hemoptisis:
+          "Sangre no he visto.",
+        antecedentes:
+          "No tengo enfermedad pulmonar conocida.",
+        examen:
+          "Me encuentran ruidos en la base derecha y la saturación algo baja."
       }
     },
     hiddenHistory: {
+      diagnosis: "Neumonía adquirida en la comunidad",
       identification: {
-        fullName: "Rosa Elena Martínez Salazar",
-        documentId: "43.222.908",
-        bloodTypeRh: "B positivo (B+)",
-        age: 64,
-        sex: "Femenino",
-        genderIdentity: "Mujer cisgénero",
-        ethnicity: "Se autorreconoce como mestiza",
-        birthDate: "1962-11-03",
-        phone: "300 000 0006",
-        address: "Medellín, Antioquia",
-        socioeconomicStratum: "Estrato 2",
-        educationLevel: "Primaria completa",
-        residenceArea: "Residencia urbana",
-        insurance: "EPS simulada Savia Salud",
-        maritalStatus: "Separada",
-        occupation: "Vendedora informal",
-        placeOfBirth: "Medellín, Antioquia",
-        emergencyContact: "Hijo: Juan Martínez, 300 000 0106",
-        dominantHand: "Diestra",
-        mainLanguage: "Español",
-        disability: "No refiere discapacidad conocida",
-        companion: "Consulta acompañada por su hijo",
-        informantReliability: "Información confiable"
+        document: "43.222.908",
+        rh: "B+"
       },
-      presentIllness:
-        "Cuadro de 5 días de evolución con tos inicialmente seca, luego productiva con expectoración amarillenta, fiebre subjetiva, escalofríos, dolor torácico pleurítico, disnea progresiva y fatiga.",
-      history: {
-        pathological: [
-          "Hipertensión arterial",
-          "EPOC leve referido"
-        ],
-        surgical: ["Colecistectomía hace varios años"],
-        traumatic: ["Niega trauma reciente"],
-        pharmacological: [
-          "Losartán",
-          "Salbutamol inhalado ocasional"
-        ],
-        allergies: ["Niega alergias medicamentosas conocidas"],
-        toxicological: [
-          "Exfumadora",
-          "Niega alcohol en exceso",
-          "Niega sustancias psicoactivas"
-        ],
-        gynecoObstetric: [
-          "Menopausia desde hace varios años",
-          "Niega sangrado genital actual"
-        ],
-        family: [
-          "Madre hipertensa",
-          "Niega tuberculosis familiar conocida"
-        ],
-        occupational: [
-          "Vendedora informal",
-          "Trabaja en calle, expuesta a cambios de clima"
-        ],
-        epidemiological: [
-          "Niega viaje reciente",
-          "Niega contacto claro con tuberculosis",
-          "Refiere contacto con personas con gripa en el trabajo"
-        ]
-      },
-      reviewOfSystems: {
-        general: "Fiebre subjetiva, escalofríos y fatiga.",
-        cardiovascular:
-          "Niega dolor torácico opresivo, palpitaciones o edema.",
-        respiratory:
-          "Tos productiva, expectoración amarilla, disnea y dolor pleurítico.",
-        gastrointestinal:
-          "Disminución del apetito, sin vómito persistente ni diarrea.",
-        genitourinary: "Niega disuria.",
-        neurologic: "Niega pérdida de conciencia o déficit focal.",
-        musculoskeletal: "Dolor en el pecho asociado a tos y respiración profunda.",
-        skin: "Niega lesiones cutáneas.",
-        endocrine: "Niega diabetes conocida.",
-        psychiatric: "Preocupada por la falta de aire."
-      },
-      results: {
-        labs: [
-          "Leucocitosis",
-          "Neutrofilia",
-          "PCR elevada"
-        ],
-        imaging: [
-          "Radiografía de tórax: consolidación basal derecha"
-        ],
-        complementaryStudies: [
-          "Oximetría con saturación disminuida",
-          "Gram de esputo no disponible inicialmente"
-        ]
+      presentIllness: [
+        "Cinco días de tos.",
+        "Evolución a expectoración amarillenta.",
+        "Fiebre y escalofríos.",
+        "Dolor pleurítico en hemitórax derecho.",
+        "Disnea y fatiga."
+      ],
+      pastHistory: [
+        "Sin EPOC conocido.",
+        "Sin falla cardiaca conocida.",
+        "No tabaquismo activo importante si se pregunta."
+      ],
+      paraclinics: {
+        cbc: "Leucocitosis con neutrofilia.",
+        crp: "Elevada.",
+        chestXray: "Consolidación basal derecha."
       }
     },
     physicalExam: {
+      general: "Paciente cansada, febril, con tos durante la entrevista.",
       vitalSigns: {
         bloodPressure: "126/78 mmHg",
         heartRate: "104 lpm",
         respiratoryRate: "26 rpm",
-        oxygenSaturation: "91%",
-        temperature: "38.5 °C"
+        temperature: "38.5 °C",
+        oxygenSaturation: "91% al aire ambiente"
       },
-      general: "Paciente febril, taquipneica, cansada.",
-      respiratory: {
-        inspection: "Uso leve de músculos accesorios.",
-        palpation: "Expansión torácica algo disminuida en base derecha.",
-        percussion: "Matidez leve en base pulmonar derecha.",
-        auscultation:
-          "Disminución del murmullo vesicular en base derecha con crepitantes.",
-        addedSounds: "Crepitantes en base pulmonar derecha."
-      },
-      cardiovascular: {
-        rhythm: "Rítmico, taquicárdico.",
-        heartSounds: "Ruidos cardíacos sin soplos evidentes."
-      },
-      abdomen: "Blando, no doloroso.",
-      extremities: "Sin edema.",
-      neurologic: "Alerta y orientada, sin déficit focal."
+      respiratory:
+        "Disminución del murmullo vesicular en base derecha, crépitos, matidez a la percusión en base derecha.",
+      cardiovascular: "Rítmico, sin signos de congestión.",
+      extremities: "Sin edema periférico."
     },
     evaluationChecklist: [
-      "Caracterizó tos.",
-      "Preguntó expectoración.",
+      "Exploró tos y tiempo de evolución.",
+      "Preguntó características de la expectoración.",
       "Preguntó fiebre y escalofríos.",
+      "Caracterizó dolor pleurítico.",
+      "Preguntó disnea y tolerancia al esfuerzo.",
+      "Preguntó hemoptisis.",
+      "Solicitó signos vitales y saturación.",
+      "Solicitó auscultación pulmonar.",
+      "Evaluó percusión y murmullo vesicular.",
+      "Consideró neumonía y diferenciales como asma/EPOC, falla cardiaca y tromboembolismo."
+    ]
+  },
+
+  {
+    id: "case-10",
+    publicLabel: "Paciente 09",
+    publicSex: "Femenino",
+    publicAge: 39,
+    simulatedPerson: {
+      fullName: "Laura Marcela Ceballos Restrepo",
+      age: 39,
+      sex: "Femenino",
+      occupation: "Docente de primaria",
+      personality:
+        "Preocupada por no poder trabajar, colaboradora. Tiene miedo de que sea algo grave de columna."
+    },
+    hiddenAcademicObjective:
+      "Evaluar lumbalgia mecánica usando ALICIA FREDUSA, relación con esfuerzo/movimiento, ausencia de banderas rojas y examen neurológico normal.",
+    mainComplaint:
+      "Me agaché a levantar una caja y me quedó un dolor muy fuerte en la espalda baja.",
+    conversationBehavior: {
+      baseline:
+        "Describe dolor lumbar mecánico y preocupación por incapacidad laboral.",
+      ifEmpathic:
+        "Permite explorar banderas rojas con tranquilidad.",
+      ifRudeOrDisorganized:
+        "Se preocupa más y pregunta si se va a quedar paralizada.",
+      ifTooManyQuestions:
+        "Dice que son muchas cosas y que mejor le pregunten una por una."
+    },
+    importantNegatives: [
+      "No fiebre",
+      "No pérdida de peso",
+      "No cáncer conocido",
+      "No trauma mayor",
+      "No uso crónico de corticoides",
+      "No déficit motor",
+      "No anestesia en silla de montar",
+      "No incontinencia urinaria o fecal",
+      "No retención urinaria",
+      "No dolor radicular franco"
+    ],
+    responseGuide: {
+      topicAnswers: {
+        motivo:
+          "Me agaché a levantar una caja pesada y desde ahí me duele la espalda baja.",
+        aparicion:
+          "Empezó ayer, justo después de levantar la caja.",
+        localizacion:
+          "Es en la parte baja de la espalda.",
+        irradiacion:
+          "A veces se me va un poco al glúteo, pero no baja claro por debajo de la rodilla.",
+        caracter:
+          "Es como una punzada o espasmo, como si se me hubiera contraído la espalda.",
+        intensidad:
+          "Al moverme es 7 de 10, quieta baja como a 4.",
+        agravantesAtenuantes:
+          "Empeora al agacharme, girar, levantarme de la silla o cargar peso. Mejora con reposo relativo.",
+        frecuenciaDuracion:
+          "Está ahí desde ayer, y se pone peor con movimientos.",
+        sintomasAsociados:
+          "Siento rigidez y me cuesta caminar rápido o agacharme.",
+        neurologico:
+          "No he perdido fuerza, no se me duermen las piernas y controlo bien esfínteres.",
+        alarma:
+          "No fiebre, no pérdida de peso, no cáncer, no golpe fuerte."
+      }
+    },
+    hiddenHistory: {
+      diagnosis: "Lumbalgia mecánica aguda sin signos de alarma",
+      aliciaFredusa: {
+        aparicion: "Empezó ayer después de levantar una caja pesada.",
+        localizacion: "Región lumbar baja.",
+        irradiacion: "Puede ir a glúteo, no baja claramente por debajo de la rodilla.",
+        caracter: "Punzada, tensión o espasmo muscular.",
+        intensidad: "7/10 al moverse, 4/10 en reposo.",
+        atenuantesAgravantes:
+          "Mejora con reposo relativo; empeora al agacharse, levantarse, girar o cargar peso.",
+        frecuencia: "Persistente con exacerbaciones al movimiento.",
+        duracion: "Cerca de 24 horas.",
+        sintomasAsociados:
+          "Rigidez, contractura, dificultad para caminar rápido o agacharse."
+      },
+      presentIllness: [
+        "Dolor posterior a esfuerzo.",
+        "No trauma mayor.",
+        "No caída.",
+        "No debilidad.",
+        "No alteración de esfínteres.",
+        "No anestesia en silla de montar.",
+        "No fiebre ni pérdida de peso."
+      ],
+      pastHistory: [
+        "Episodios leves previos de dolor lumbar.",
+        "Sedentarismo relativo.",
+        "No osteoporosis conocida.",
+        "No drogas IV.",
+        "No cirugías de columna.",
+        "No alergias conocidas."
+      ],
+      paraclinics: {
+        imaging:
+          "No requiere imagen inicial si no hay banderas rojas.",
+        labs:
+          "Laboratorios no necesarios en presentación típica."
+      }
+    },
+    physicalExam: {
+      general: "Paciente estable, con dolor al moverse.",
+      gait: "Marcha lenta o cautelosa, pero independiente.",
+      lumbar:
+        "Dolor paravertebral lumbar, contractura muscular lumbar, limitación de flexión por dolor.",
+      straightLegRaise:
+        "Lasègue negativo o dolor lumbar sin irradiación radicular verdadera.",
+      neurologic:
+        "Fuerza 5/5 en miembros inferiores, sensibilidad conservada, reflejos conservados.",
+      vascular: "Pulsos distales presentes.",
+      redFlags: "Sin signos de cauda equina."
+    },
+    evaluationChecklist: [
+      "Caracterizó dolor con ALICIA FREDUSA.",
+      "Exploró mecanismo de inicio.",
+      "Preguntó relación con movimiento y carga.",
+      "Exploró irradiación.",
+      "Preguntó debilidad y sensibilidad.",
+      "Preguntó esfínteres.",
+      "Preguntó anestesia en silla de montar.",
+      "Preguntó fiebre, pérdida de peso, cáncer, trauma y corticoides.",
+      "Solicitó examen neurológico de miembros inferiores.",
+      "Solicitó Lasègue.",
+      "Evaluó marcha.",
+      "Reconoció cuadro compatible con lumbalgia mecánica sin signos de alarma."
+    ]
+  },
+
+  {
+    id: "case-5",
+    publicLabel: "Paciente 10",
+    publicSex: "Masculino",
+    publicAge: 58,
+    simulatedPerson: {
+      fullName: "Carlos Alberto Londoño Ruiz",
+      age: 58,
+      sex: "Masculino",
+      occupation: "Taxista",
+      personality:
+        "Ansioso, asustado por el dolor torácico, responde con frases cortas."
+    },
+    hiddenAcademicObjective:
+      "Evaluar dolor torácico con ALICIA FREDUSA, factores de riesgo cardiovascular, síntomas vegetativos e impresión de síndrome coronario agudo.",
+    mainComplaint:
+      "Tengo un dolor muy fuerte en el pecho que se me va al brazo izquierdo.",
+    conversationBehavior: {
+      baseline:
+        "Se muestra angustiado, con dolor, preocupado por estar infartándose.",
+      ifEmpathic:
+        "Describe mejor irradiación, opresión, sudoración y factores de riesgo.",
+      ifRudeOrDisorganized:
+        "Se angustia y repite que le duele el pecho.",
+      ifTooManyQuestions:
+        "Dice que no puede responder tantas cosas porque le duele mucho."
+    },
+    importantNegatives: [
+      "No fiebre",
+      "No tos purulenta",
+      "No dolor reproducible claramente con palpación",
+      "No trauma torácico",
+      "No hemoptisis",
+      "No síncope prolongado"
+    ],
+    responseGuide: {
+      topicAnswers: {
+        motivo:
+          "Tengo un dolor opresivo en el pecho que se me va al brazo izquierdo y a la mandíbula.",
+        aparicion:
+          "Empezó hace como una hora, mientras trabajaba.",
+        localizacion:
+          "En el centro del pecho.",
+        irradiacion:
+          "Se me va al brazo izquierdo y a la mandíbula.",
+        caracter:
+          "Es como una presión, como si me apretaran el pecho.",
+        intensidad:
+          "Está en 9 de 10.",
+        agravantesAtenuantes:
+          "No se me quita con reposo. Me asusta porque sigue ahí.",
+        frecuenciaDuracion:
+          "Es constante desde que empezó.",
+        sintomasAsociados:
+          "Estoy sudando, con náuseas y algo de falta de aire.",
+        antecedentes:
+          "Tengo presión alta, azúcar alta y colesterol. También fumé bastante.",
+        familiar:
+          "Mi papá tuvo un infarto.",
+        examen:
+          "Estoy sudoroso, taquicárdico y con presión alta."
+      }
+    },
+    hiddenHistory: {
+      diagnosis: "Síndrome coronario agudo con elevación del ST inferior",
+      identification: {
+        document: "71.456.982",
+        rh: "A+"
+      },
+      aliciaFredusa: {
+        aparicion: "Hace 1 hora.",
+        localizacion: "Centro del pecho.",
+        irradiacion: "Brazo izquierdo y mandíbula.",
+        caracter: "Opresivo.",
+        intensidad: "9/10.",
+        atenuantesAgravantes: "No cede claramente con reposo.",
+        frecuencia: "Constante.",
+        duracion: "Desde el inicio, una hora.",
+        sintomasAsociados: "Diaforesis, náuseas, disnea."
+      },
+      riskFactors: [
+        "Hipertensión arterial.",
+        "Diabetes mellitus.",
+        "Dislipidemia.",
+        "Tabaquismo previo o activo.",
+        "Padre con infarto."
+      ],
+      paraclinics: {
+        ecg: "Elevación del ST en derivaciones inferiores.",
+        troponin: "Elevada."
+      }
+    },
+    physicalExam: {
+      general: "Paciente ansioso, diaforético, con facies de dolor.",
+      vitalSigns: {
+        bloodPressure: "154/92 mmHg",
+        heartRate: "108 lpm",
+        respiratoryRate: "24 rpm",
+        temperature: "36.7 °C",
+        oxygenSaturation: "95% al aire ambiente"
+      },
+      cardiovascular:
+        "Ruidos cardíacos rítmicos, taquicárdico, sin soplo dominante descrito.",
+      respiratory: "Sin crépitos francos, sin sibilancias predominantes.",
+      chestWall: "Dolor no reproducible claramente con palpación.",
+      extremities: "Sin edema marcado."
+    },
+    evaluationChecklist: [
+      "Caracterizó dolor torácico con ALICIA FREDUSA.",
+      "Exploró irradiación a brazo y mandíbula.",
+      "Preguntó síntomas vegetativos.",
       "Preguntó disnea.",
-      "Preguntó dolor pleurítico.",
-      "Exploró antecedentes respiratorios.",
+      "Exploró factores de riesgo cardiovascular.",
+      "Preguntó antecedentes familiares.",
+      "Diferenció dolor no musculoesquelético.",
       "Solicitó signos vitales.",
-      "Realizó examen pulmonar dirigido.",
-      "Solicitó radiografía de tórax."
+      "Consideró ECG y troponina.",
+      "Reconoció síndrome coronario agudo como posibilidad prioritaria."
+    ]
+  },
+
+  {
+    id: "case-8",
+    publicLabel: "Paciente 11",
+    publicSex: "Femenino",
+    publicAge: 43,
+    simulatedPerson: {
+      fullName: "Claudia Patricia Ramírez Vélez",
+      age: 43,
+      sex: "Femenino",
+      occupation: "Auxiliar administrativa",
+      personality:
+        "Preocupada, irritable por el dolor, pero colaboradora si el estudiante es claro."
+    },
+    hiddenAcademicObjective:
+      "Evaluar dolor en hipocondrio derecho con ALICIA FREDUSA, relación con comida grasa, náuseas, fiebre, Murphy positivo y diferenciales biliares.",
+    mainComplaint:
+      "Tengo un dolor muy fuerte debajo de las costillas del lado derecho.",
+    conversationBehavior: {
+      baseline:
+        "Se muestra con dolor y náuseas. Responde mejor a preguntas concretas.",
+      ifEmpathic:
+        "Describe relación con comida grasosa y episodios previos.",
+      ifRudeOrDisorganized:
+        "Se irrita porque tiene dolor y náuseas.",
+      ifTooManyQuestions:
+        "Dice que le duele mucho y que le pregunten una cosa a la vez."
+    },
+    importantNegatives: [
+      "No ictericia franca",
+      "No coluria marcada",
+      "No acolia",
+      "No fiebre alta con escalofríos intensos",
+      "No confusión",
+      "No hipotensión",
+      "No dolor torácico opresivo",
+      "No disuria",
+      "No hematuria"
+    ],
+    responseGuide: {
+      topicAnswers: {
+        motivo:
+          "Me duele muy fuerte debajo de las costillas del lado derecho.",
+        aparicion:
+          "Empezó hace unas 10 o 12 horas.",
+        localizacion:
+          "Es debajo de las costillas del lado derecho.",
+        irradiacion:
+          "Se me va hacia la espalda o hacia el omóplato derecho.",
+        caracter:
+          "Al principio era como cólico, pero ahora es más constante.",
+        intensidad:
+          "Está como en 8 de 10.",
+        agravantesAtenuantes:
+          "Empezó después de comer algo grasoso. Me duele más si respiro profundo o me tocan.",
+        frecuenciaDuracion:
+          "Esta vez no se me ha quitado. Otros cólicos me duraban menos.",
+        sintomasAsociados:
+          "Tengo náuseas, vomité una vez, no tengo ganas de comer y me he sentido caliente.",
+        ictericia:
+          "Amarilla como tal no me he visto.",
+        urinario:
+          "Ardor o sangre en la orina no.",
+        examen:
+          "Cuando me palpan debajo de las costillas derechas y me piden respirar, me duele mucho."
+      }
+    },
+    hiddenHistory: {
+      diagnosis: "Colecistitis aguda litiásica",
+      aliciaFredusa: {
+        aparicion: "10-12 horas.",
+        localizacion: "Hipocondrio derecho.",
+        irradiacion: "Espalda o escápula derecha.",
+        caracter: "Tipo cólico inicial, luego más constante.",
+        intensidad: "8/10.",
+        atenuantesAgravantes:
+          "Empeora con inspiración profunda, movimiento y palpación. Inicio después de comida grasa.",
+        frecuencia: "Continuo con oleadas más fuertes.",
+        duracion: "Más prolongado que episodios previos.",
+        sintomasAsociados: "Náuseas, vómito, hiporexia, sensación febril."
+      },
+      presentIllness: [
+        "Dolor posterior a comida grasosa.",
+        "Episodios previos parecidos más leves y breves.",
+        "Esta vez el dolor no cede.",
+        "Náuseas, un vómito, hiporexia, sensación febril.",
+        "No diarrea importante ni síntomas urinarios."
+      ],
+      pastHistory: [
+        "Sobrepeso leve.",
+        "Episodios previos de cólicos después de comidas grasas.",
+        "No cirugía abdominal previa.",
+        "No embarazo actual.",
+        "No alergias conocidas."
+      ],
+      paraclinics: {
+        cbc: "Leucocitosis con neutrofilia.",
+        crp: "Elevada.",
+        bilirubin: "Normal o discretamente elevada.",
+        ultrasound:
+          "Cálculos vesiculares, pared vesicular engrosada, dolor con transductor en hipocondrio derecho.",
+        bileDuct: "Sin dilatación importante de vía biliar."
+      }
+    },
+    physicalExam: {
+      general: "Paciente con facies de dolor y náuseas.",
+      vitalSigns: {
+        bloodPressure: "124/78 mmHg",
+        heartRate: "102 lpm",
+        respiratoryRate: "18 rpm",
+        temperature: "38.1 °C",
+        oxygenSaturation: "98% al aire ambiente"
+      },
+      abdomen:
+        "Dolor a la palpación en hipocondrio derecho, Murphy positivo, defensa localizada leve.",
+      peritonitis: "Sin peritonitis generalizada.",
+      bowelSounds: "Ruidos intestinales presentes.",
+      jaundice: "Sin ictericia marcada.",
+      cardiopulmonary: "Sin hallazgos principales."
+    },
+    evaluationChecklist: [
+      "Caracterizó dolor con ALICIA FREDUSA.",
+      "Preguntó relación con comida grasa.",
+      "Preguntó episodios previos.",
+      "Preguntó náuseas y vómito.",
+      "Preguntó fiebre.",
+      "Preguntó ictericia, coluria y acolia.",
+      "Descartó síntomas urinarios.",
+      "Solicitó Murphy.",
+      "Exploró hipocondrio derecho.",
+      "Buscó signos de irritación peritoneal.",
+      "Consideró cólico biliar, coledocolitiasis, colangitis, pancreatitis y hepatitis."
+    ]
+  },
+
+  {
+    id: "case-3",
+    publicLabel: "Paciente 12",
+    publicSex: "Femenino",
+    publicAge: 49,
+    simulatedPerson: {
+      fullName: "Marcela Andrea Ruiz Castaño",
+      age: 49,
+      sex: "Femenino",
+      occupation: "Peluquera",
+      personality:
+        "Trabajadora, preocupada por no poder usar el brazo. Colaboradora, pero teme que le duela al examen."
+    },
+    hiddenAcademicObjective:
+      "Evaluar dolor de hombro con ALICIA FREDUSA, relación con movimientos sobre la cabeza, movilidad activa/pasiva y maniobras de pinzamiento/manguito rotador.",
+    mainComplaint:
+      "Me duele mucho el hombro derecho, sobre todo cuando levanto el brazo.",
+    conversationBehavior: {
+      baseline:
+        "Cuida el brazo y evita elevarlo. Describe dolor al peinar, trabajar y alcanzar objetos.",
+      ifEmpathic:
+        "Permite explorar mejor maniobras y limitación funcional.",
+      ifRudeOrDisorganized:
+        "Se pone defensiva porque teme que le muevan el hombro con fuerza.",
+      ifTooManyQuestions:
+        "Dice que mejor le pregunten una cosa a la vez porque le preocupa el dolor."
+    },
+    importantNegatives: [
+      "No trauma mayor",
+      "No fiebre",
+      "No enrojecimiento articular",
+      "No dolor torácico",
+      "No déficit neurológico distal",
+      "No pérdida completa de fuerza súbita"
+    ],
+    responseGuide: {
+      topicAnswers: {
+        motivo:
+          "Me duele el hombro derecho cuando levanto el brazo o trabajo peinando.",
+        aparicion:
+          "Lleva varias semanas, empezó poco a poco.",
+        localizacion:
+          "Es en el hombro derecho, más por la parte lateral.",
+        irradiacion:
+          "A veces baja un poco hacia la parte lateral del brazo, pero no hasta la mano.",
+        caracter:
+          "Es un dolor punzante o como quemante cuando levanto el brazo.",
+        intensidad:
+          "Al moverlo puede llegar a 7 de 10.",
+        agravantesAtenuantes:
+          "Empeora al peinar, levantar el brazo, alcanzar cosas arriba o dormir sobre ese lado. Mejora con reposo.",
+        frecuenciaDuracion:
+          "Lo siento casi todos los días, sobre todo con movimientos.",
+        sintomasAsociados:
+          "Siento debilidad por dolor y me cuesta trabajar, pero la mano no se me duerme.",
+        trabajo:
+          "Soy peluquera y mantengo mucho los brazos levantados.",
+        examen:
+          "Me duele más al levantar el brazo y con unas pruebas que me hacen en el hombro."
+      }
+    },
+    hiddenHistory: {
+      diagnosis: "Síndrome de manguito rotador / pinzamiento subacromial",
+      identification: {
+        document: "43.890.127",
+        rh: "B+"
+      },
+      aliciaFredusa: {
+        aparicion: "Semanas de evolución, inicio progresivo.",
+        localizacion: "Hombro derecho, región lateral.",
+        irradiacion: "Cara lateral del brazo, no hasta la mano.",
+        caracter: "Punzante o quemante con elevación.",
+        intensidad: "Hasta 7/10 con movimiento.",
+        atenuantesAgravantes:
+          "Empeora con elevación, peinar, alcanzar objetos y dormir sobre ese lado. Mejora con reposo.",
+        frecuencia: "Casi diaria con movimientos.",
+        duracion: "Semanas.",
+        sintomasAsociados:
+          "Limitación funcional, debilidad por dolor, sin parestesias distales."
+      },
+      presentIllness: [
+        "Dolor progresivo de hombro derecho.",
+        "Empeora con actividades sobre la cabeza.",
+        "Dificultad para trabajar como peluquera.",
+        "Dolor nocturno al dormir sobre el lado afectado."
+      ],
+      pastHistory: [
+        "Sin trauma mayor reciente.",
+        "Sin enfermedad reumatológica conocida.",
+        "No cirugías de hombro.",
+        "No alergias conocidas."
+      ]
+    },
+    physicalExam: {
+      general: "Buen estado general, protege el hombro derecho.",
+      shoulder: {
+        inspection: "Sin deformidad evidente.",
+        palpation: "Dolor subacromial o lateral.",
+        rangeOfMotion:
+          "Dolor mayor con movilidad activa que pasiva, especialmente abducción.",
+        painfulArc: "Arco doloroso positivo.",
+        neer: "Positivo.",
+        hawkins: "Positivo.",
+        jobe: "Positivo por dolor/debilidad.",
+        externalRotation: "Puede doler, fuerza limitada por dolor.",
+        neurovascular: "Neurovascular distal conservado."
+      },
+      cervical: "Sin signos claros de radiculopatía cervical."
+    },
+    evaluationChecklist: [
+      "Caracterizó dolor con ALICIA FREDUSA.",
+      "Preguntó ocupación y movimientos repetitivos sobre la cabeza.",
+      "Exploró dolor nocturno.",
+      "Diferenció irradiación de parestesias.",
+      "Evaluó movilidad activa y pasiva.",
+      "Solicitó arco doloroso.",
+      "Solicitó Neer.",
+      "Solicitó Hawkins.",
+      "Solicitó Jobe.",
+      "Evaluó neurovascular distal.",
+      "Consideró diferenciales como capsulitis adhesiva, tendinopatía, ruptura de manguito, radiculopatía cervical."
     ]
   }
 ];
