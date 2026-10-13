@@ -406,7 +406,7 @@ export default function HomePage() {
                 <span>Tiempo máximo de entrevista para estudiantes</span>
               </div>
               <div>
-                <strong>6 pacientes</strong>
+                <strong>12 pacientes</strong>
                 <span>Casos clínicos simulados</span>
               </div>
               <div>
