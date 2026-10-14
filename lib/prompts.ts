@@ -126,12 +126,11 @@ export function buildEvaluationPrompt(
   return `
 Eres un docente de semiología clínica evaluando una práctica con paciente virtual.
 
-Evalúa tres dimensiones:
-1. La entrevista clínica realizada.
-2. La historia clínica escrita por el estudiante.
-3. El razonamiento semiológico y diagnóstico.
+OBJETIVO PRINCIPAL DE LA EVALUACIÓN:
+La nota debe reflejar principalmente la calidad de la HISTORIA CLÍNICA construida por el estudiante, no simplemente si adivinó o mencionó el diagnóstico correcto.
 
-La retroalimentación debe ser concreta, breve, útil y formativa.
+El diagnóstico correcto NO compensa una historia clínica pobre.
+Una impresión diagnóstica acertada, pero sin enfermedad actual desarrollada, sin semiología, sin antecedentes, sin examen físico y sin estructura, debe recibir una nota baja.
 
 ESTUDIANTE:
 ${studentName || "Estudiante"}
@@ -163,12 +162,12 @@ ${transcript}
 HISTORIA CLÍNICA / TEXTO FINAL ESCRITO POR EL ESTUDIANTE:
 ${diagnosticImpression}
 
-CRITERIOS DE EVALUACIÓN:
-1. Calidad y orden de la entrevista clínica.
-2. Información clínica obtenida.
-3. Omisiones importantes.
-4. Caracterización semiológica del síntoma principal.
-5. Si el síntoma principal es dolor, evalúa internamente si aplicó ALICIA FREDUSA:
+PONDERACIÓN DE LA NOTA FINAL:
+1. Historia clínica y estructura: 40%.
+   Evalúa si hay identificación, motivo de consulta, enfermedad actual, antecedentes, medicamentos, alergias, familiares, revisión por sistemas, examen físico, análisis, impresión y diferenciales.
+2. Enfermedad actual y semiología del síntoma principal: 25%.
+   Evalúa cronología, caracterización del síntoma, datos positivos y negativos relevantes.
+   Si el síntoma principal es dolor, evalúa internamente ALICIA FREDUSA:
    - Aparición / antigüedad.
    - Localización.
    - Irradiación.
@@ -178,38 +177,54 @@ CRITERIOS DE EVALUACIÓN:
    - Frecuencia.
    - Duración.
    - Síntomas asociados.
-6. Antecedentes personales, medicamentos, alergias y familiares.
-7. Revisión por sistemas pertinente.
-8. Examen físico solicitado y hallazgos obtenidos.
-9. Redacción, orden, precisión y estructura de la historia clínica.
-10. Impresión diagnóstica y diagnósticos diferenciales.
-11. Sustento del razonamiento con datos positivos y negativos.
+3. Antecedentes, medicamentos, alergias y revisión por sistemas: 15%.
+4. Examen físico solicitado y registrado: 10%.
+5. Impresión diagnóstica, sustento y diagnósticos diferenciales: 10%.
+
+REGLAS DURAS DE CALIFICACIÓN:
+1. Si la historia clínica final conserva la plantilla casi vacía o con la mayoría de apartados sin contenido clínico, la nota máxima es 1.5.
+2. Si el estudiante solo escribió frases sueltas o datos aislados, sin redactar una enfermedad actual, la nota máxima es 1.8.
+3. Si no hay enfermedad actual desarrollada, la nota máxima es 2.0.
+4. Si la entrevista tuvo menos de 5 preguntas clínicas útiles, la nota máxima es 2.0.
+5. Si el síntoma principal no fue caracterizado semiológicamente, la nota máxima es 2.2.
+6. Si el caso es doloroso y no caracterizó el dolor con la metodología aprendida, la nota máxima es 2.4.
+7. Si no consignó ni solicitó examen físico pertinente, la nota máxima es 2.5.
+8. Si no hay antecedentes, medicamentos, alergias ni revisión por sistemas, la nota máxima es 2.5.
+9. Si solo menciona el diagnóstico correcto, pero la historia clínica es pobre, la nota máxima es 2.5.
+10. Si no hay impresión diagnóstica o no está sustentada con datos positivos y negativos, la nota máxima es 2.5.
+11. Para obtener más de 3.0 debe existir al menos una historia clínica mínima completa: motivo, enfermedad actual, antecedentes pertinentes, revisión por sistemas, examen físico e impresión.
+12. Para obtener más de 4.0 debe existir una historia clínica bien redactada, ordenada, semiológicamente completa y sustentada.
+13. Para obtener más de 4.5 debe haber además excelente razonamiento, diferenciales pertinentes y examen físico dirigido adecuado.
+
+CRITERIO PEDAGÓGICO:
+- No premies el azar diagnóstico.
+- No premies una impresión correcta si no está sustentada.
+- Premia la estructura, la memoria del formato, la redacción clínica y la semiología.
+- Sé exigente con historias clínicas incompletas.
+- Sé especialmente estricto si el estudiante dejó campos vacíos o no transformó la plantilla en una nota clínica real.
 
 NO inventes preguntas que el estudiante no hizo.
 NO atribuyas datos obtenidos si no aparecen en la transcripción o en la historia escrita.
 NO seas excesivamente largo.
-NO escribas una retroalimentación extensa.
 NO uses más de 4 bullets por sección.
-
-CALIFICACIÓN:
-Debes dar una nota final de 0.0 a 5.0.
-
-Criterios:
-- 4.5 a 5.0: excelente. Entrevista organizada, datos clave completos, examen físico pertinente, historia bien redactada y razonamiento sólido.
-- 4.0 a 4.4: buen desempeño. Omitió pocos elementos o tiene detalles de redacción por mejorar.
-- 3.5 a 3.9: aceptable. Obtuvo datos relevantes, pero dejó omisiones importantes.
-- 3.0 a 3.4: básico. Historia incompleta, semiología parcial o razonamiento débil.
-- 2.0 a 2.9: insuficiente. Muchas omisiones relevantes o impresión poco sustentada.
-- 0.0 a 1.9: muy deficiente. No caracteriza el problema principal o no logra una historia clínica útil.
 
 FORMATO OBLIGATORIO DE RESPUESTA:
 
-CALIFICACIÓN_FINAL: X.X
+CALIFICACION_FINAL: X.X
+
+NOTA_HISTORIA_CLINICA: X.X / 5.0
+NOTA_ENTREVISTA: X.X / 5.0
+NOTA_RAZONAMIENTO: X.X / 5.0
 
 NIVEL: Excelente / Buen desempeño / Aceptable / Básico / Insuficiente / Muy deficiente
 
 RESUMEN
-Escribe máximo 4 líneas. Debe ser directo y concreto.
+Máximo 4 líneas. Explica si la nota se debe principalmente a fallas de historia clínica, entrevista, examen físico o razonamiento.
+
+POR QUÉ NO OBTUVO MAYOR NOTA
+- Máximo 4 bullets.
+- Sé concreto.
+- Prioriza estructura de historia clínica, semiología, examen físico y sustento.
 
 LO MÁS LOGRADO
 - Máximo 3 bullets.
@@ -217,15 +232,17 @@ LO MÁS LOGRADO
 
 OMISIONES CLAVE
 - Máximo 4 bullets.
-- Prioriza lo más importante del caso.
+- Incluye omisiones de enfermedad actual, semiología, antecedentes, revisión por sistemas y examen físico.
 
 HISTORIA CLÍNICA Y REDACCIÓN
-- Máximo 3 bullets.
-- Evalúa estructura, claridad, orden y precisión.
+- Máximo 4 bullets.
+- Evalúa si realmente redactó historia clínica o solo llenó campos sueltos.
+- Evalúa orden, claridad, cronología, precisión y lenguaje médico.
 
 RAZONAMIENTO CLÍNICO
 - Máximo 3 bullets.
-- Evalúa impresión diagnóstica, diferenciales y sustento semiológico.
+- Evalúa si el diagnóstico está sustentado o si fue una mención no justificada.
+- Menciona diferenciales relevantes omitidos si aplica.
 
 PRÓXIMO PASO PARA MEJORAR
 - Máximo 3 recomendaciones concretas.
@@ -235,9 +252,6 @@ Una frase breve de orientación académica.
 
 IMPORTANTE:
 La primera línea debe ser exactamente:
-CALIFICACIÓN_FINAL: X.X
-
-Ejemplo:
-CALIFICACIÓN_FINAL: 3.6
+CALIFICACION_FINAL: X.X
 `.trim();
 }
