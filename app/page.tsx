@@ -15,6 +15,7 @@ type Student = {
   firstName: string;
   lastName: string;
   code: string;
+  role?: "student" | "professor";
 };
 
 type CaseOption = {
@@ -54,6 +55,7 @@ function isProfessorUser(student: Student | null): boolean {
   const normalizedLastName = normalizeStorageValue(student.lastName);
 
   return (
+    student.role === "professor" ||
     normalizedCode === "PROFESOR" ||
     normalizedCode === "SEM-PROFESOR" ||
     normalizedFirstName === "PROFESOR" ||
@@ -65,7 +67,9 @@ function getSessionKey(studentCode: string, caseId: string): string {
   return `${STORAGE_PREFIX}:started-at:${normalizeStorageValue(studentCode)}:${caseId}`;
 }
 
-
+function getCompletedCasesKey(studentCode: string): string {
+  return `${STORAGE_PREFIX}:completed-cases:${normalizeStorageValue(studentCode)}`;
+}
 
 function getStoredStartTime(studentCode: string, caseId: string): number | null {
   if (typeof window === "undefined") return null;
@@ -94,7 +98,43 @@ function calculateRemainingSeconds(startedAt: number): number {
   return Math.max(0, CONSULTATION_LIMIT_SECONDS - elapsedSeconds);
 }
 
+function loadCompletedCases(studentCode: string): string[] {
+  if (typeof window === "undefined") return [];
 
+  const rawValue = window.localStorage.getItem(getCompletedCasesKey(studentCode));
+
+  if (!rawValue) return [];
+
+  try {
+    const parsedValue = JSON.parse(rawValue);
+
+    return Array.isArray(parsedValue)
+      ? parsedValue.filter((item) => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCompletedCases(studentCode: string, caseIds: string[]) {
+  if (typeof window === "undefined") return;
+
+  const uniqueCaseIds = Array.from(new Set(caseIds));
+
+  window.localStorage.setItem(
+    getCompletedCasesKey(studentCode),
+    JSON.stringify(uniqueCaseIds)
+  );
+}
+
+function markCaseCompleted(studentCode: string, caseId: string): string[] {
+  const currentCaseIds = loadCompletedCases(studentCode);
+  const nextCaseIds = Array.from(new Set([...currentCaseIds, caseId]));
+
+  saveCompletedCases(studentCode, nextCaseIds);
+
+  return nextCaseIds;
+}
 
 function blockClipboardAction(
   event: ClipboardEvent<HTMLTextAreaElement> | DragEvent<HTMLTextAreaElement>
@@ -138,6 +178,7 @@ export default function HomePage() {
   const [suspended, setSuspended] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(CONSULTATION_LIMIT_SECONDS);
   const [timeExpired, setTimeExpired] = useState(false);
+  const [completedCaseIds, setCompletedCaseIds] = useState<string[]>([]);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -153,6 +194,8 @@ export default function HomePage() {
   const professorMode = useMemo(() => isProfessorUser(student), [student]);
 
   const consultationIsOver = !professorMode && remainingSeconds <= 0;
+
+  const completedCount = professorMode ? 0 : completedCaseIds.length;
 
   useEffect(() => {
     if (step !== "chat" || !caseStartedAt) return;
@@ -181,7 +224,6 @@ export default function HomePage() {
     return () => window.clearInterval(interval);
   }, [step, caseStartedAt, professorMode]);
 
-
   async function loadCaseOptions() {
     const res = await fetch("/api/cases");
     const data = await res.json();
@@ -196,6 +238,12 @@ export default function HomePage() {
   async function startSession(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    if (!code.trim()) {
+      setError("Ingresa tu ID de identificación.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -214,6 +262,9 @@ export default function HomePage() {
       await loadCaseOptions();
 
       setStudent(data.student);
+      setFirstName(data.student.firstName || "");
+      setLastName(data.student.lastName || "");
+      setCompletedCaseIds(loadCompletedCases(data.student.code));
       setMessages([]);
       setSelectedCaseId("");
       setCaseStartedAt(null);
@@ -234,6 +285,12 @@ export default function HomePage() {
     if (!student) return;
 
     const isProfessor = isProfessorUser(student);
+    const alreadyCompleted = completedCaseIds.includes(caseOption.id);
+
+    if (!isProfessor && alreadyCompleted) {
+      setError("Este caso ya fue realizado con este ID en este navegador. Elige otro paciente.");
+      return;
+    }
 
     const startedAt = isProfessor
       ? Date.now()
@@ -242,8 +299,6 @@ export default function HomePage() {
     const remaining = isProfessor
       ? CONSULTATION_LIMIT_SECONDS
       : calculateRemainingSeconds(startedAt);
-
-    
 
     setSelectedCaseId(caseOption.id);
     setCaseStartedAt(startedAt);
@@ -361,6 +416,11 @@ export default function HomePage() {
         throw new Error(data.error || "No se pudo evaluar.");
       }
 
+      if (!professorMode) {
+        const nextCompletedCaseIds = markCaseCompleted(student.code, selectedCaseId);
+        setCompletedCaseIds(nextCompletedCaseIds);
+      }
+
       setEvaluation(data.evaluation);
       setStep("evaluation");
     } catch (err) {
@@ -373,6 +433,7 @@ export default function HomePage() {
   function restart() {
     setStep("login");
     setStudent(null);
+    setCompletedCaseIds([]);
     setCaseOptions([]);
     setSelectedCaseId("");
     setCaseStartedAt(null);
@@ -430,8 +491,6 @@ export default function HomePage() {
               </p>
             </div>
 
-
-
             <label>
               ID de identificación
               <input
@@ -477,39 +536,64 @@ export default function HomePage() {
               <p>No está permitido copiar, pegar, cortar o arrastrar texto en el chat.</p>
               <p>
                 {professorMode
-                  ? "Modo profesor activo: no tendrás límite de tiempo."
+                  ? "Modo profesor activo: no tendrás límite de tiempo y podrás repetir casos."
                   : "Tienes 30 minutos. Al terminar, presiona Finalizar y escribe tu impresión final."}
               </p>
             </div>
+
+            {!professorMode && (
+              <p className="small">
+                Casos realizados: {completedCount} de {caseOptions.length}. Los casos completados
+                no se pueden repetir desde este navegador con el mismo ID.
+              </p>
+            )}
           </div>
 
           <div className="case-grid">
-            {caseOptions.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                className="case-card"
-                onClick={() => chooseCase(item)}
-              >
-                <div className="case-card-top">
-                  <span className="case-number">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="case-chip">Paciente virtual</span>
-                </div>
+            {caseOptions.map((item, index) => {
+              const alreadyCompleted = !professorMode && completedCaseIds.includes(item.id);
 
-                <div>
-                  <h2>{item.publicLabel}</h2>
-                  <p className="case-meta">
-                    {item.publicSex} · {item.publicAge} años
-                  </p>
-                </div>
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="case-card"
+                  disabled={alreadyCompleted}
+                  onClick={() => chooseCase(item)}
+                  style={
+                    alreadyCompleted
+                      ? {
+                          opacity: 0.6,
+                          cursor: "not-allowed",
+                          borderStyle: "dashed"
+                        }
+                      : undefined
+                  }
+                >
+                  <div className="case-card-top">
+                    <span className="case-number">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="case-chip">
+                      {alreadyCompleted ? "Realizado" : "Paciente virtual"}
+                    </span>
+                  </div>
 
-                <div className="case-hidden">
-                  Información clínica oculta
-                </div>
+                  <div>
+                    <h2>{item.publicLabel}</h2>
+                    <p className="case-meta">
+                      {item.publicSex} · {item.publicAge} años
+                    </p>
+                  </div>
 
-                <span className="case-action">Iniciar entrevista →</span>
-              </button>
-            ))}
+                  <div className="case-hidden">
+                    {alreadyCompleted ? "Caso ya realizado" : "Información clínica oculta"}
+                  </div>
+
+                  <span className="case-action">
+                    {alreadyCompleted ? "Completado" : "Iniciar entrevista →"}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {error && <p className="error">{error}</p>}
