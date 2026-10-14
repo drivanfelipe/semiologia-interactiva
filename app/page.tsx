@@ -37,50 +37,41 @@ const STORAGE_PREFIX = "semiologia-interactiva";
 
 const CLINICAL_HISTORY_TEMPLATE = `HISTORIA CLÍNICA
 
-1. Identificación
-Nombre:
-Edad:
-Sexo:
-Ocupación:
-Procedencia / residencia:
+Identificación:
 
-2. Motivo de consulta
-Escribe el motivo de consulta en palabras del paciente:
 
-3. Enfermedad actual
-Describe de forma cronológica el problema actual:
+Motivo de consulta:
 
-Si el síntoma principal es dolor, usa ALICIA FREDUSA:
-Aparición / antigüedad:
-Localización:
-Irradiación:
-Característica:
-Intensidad:
-Atenuantes / agravantes:
-Frecuencia:
-Duración:
-Síntomas asociados:
 
-4. Antecedentes personales
+Enfermedad actual:
 
-5. Medicamentos
 
-6. Alergias
+Antecedentes personales:
 
-7. Antecedentes familiares
 
-8. Revisión por sistemas pertinente
+Medicamentos:
 
-9. Examen físico solicitado y hallazgos obtenidos
 
-10. Análisis semiológico
-Datos positivos:
-Datos negativos relevantes:
-Interpretación semiológica:
+Alergias:
 
-11. Impresión diagnóstica
 
-12. Diagnósticos diferenciales
+Antecedentes familiares:
+
+
+Revisión por sistemas pertinente:
+
+
+Examen físico solicitado y hallazgos obtenidos:
+
+
+Análisis semiológico:
+
+
+Impresión diagnóstica:
+
+
+Diagnósticos diferenciales:
+
 `;
 
 function formatTime(totalSeconds: number): string {
@@ -442,7 +433,6 @@ export default function HomePage() {
       setLoading(false);
     }
   }
-
   async function evaluateCase(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -672,16 +662,17 @@ export default function HomePage() {
 
           <p className="subtitle">
             {studentName}, completa la historia clínica con los datos obtenidos durante la entrevista.
-            La retroalimentación evaluará la información recogida, la redacción, la semiología,
-            el uso de ALICIA FREDUSA cuando aplique y la impresión diagnóstica.
+            La retroalimentación evaluará la información recogida, la estructura de la historia clínica,
+            la redacción, la semiología del síntoma principal y la impresión diagnóstica.
           </p>
 
           <div className="instruction-panel">
             <strong>Recuerda</strong>
             <p>Redacta como historia clínica, no como lista de preguntas.</p>
-            <p>Si el síntoma principal es dolor, usa ALICIA FREDUSA.</p>
+            <p>Caracteriza el síntoma principal con la metodología semiológica aprendida.</p>
             <p>Incluye datos positivos y negativos relevantes.</p>
             <p>No inventes datos que no obtuviste durante la entrevista.</p>
+            <p>Organiza la información como lo harías en una historia clínica real.</p>
             <p>La calificación final será de 0 a 5.</p>
           </div>
 
@@ -711,15 +702,65 @@ export default function HomePage() {
   }
 
   if (step === "evaluation") {
+    const generatedAt = new Date();
+    const formattedDate = generatedAt.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
+    const formattedTime = generatedAt.toLocaleTimeString("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
     return (
-      <main className="container">
+      <main className="container printable-result">
         <section className="card evaluation">
           <span className="kicker">Retroalimentación académica</span>
           <h1>Resultado</h1>
+
+          <div className="report-meta">
+            <div>
+              <strong>Fecha</strong>
+              <span>{formattedDate}</span>
+            </div>
+            <div>
+              <strong>Hora</strong>
+              <span>{formattedTime}</span>
+            </div>
+            <div>
+              <strong>Estudiante</strong>
+              <span>{studentName || "Estudiante"}</span>
+            </div>
+            <div>
+              <strong>ID</strong>
+              <span>{student?.code || "No registrado"}</span>
+            </div>
+            <div>
+              <strong>Paciente</strong>
+              <span>
+                {selectedCase
+                  ? `${selectedCase.publicLabel} — ${selectedCase.publicSex}, ${selectedCase.publicAge} años`
+                  : "Paciente no registrado"}
+              </span>
+            </div>
+          </div>
+
           <pre>{evaluation}</pre>
-          <button className="btn btn-secondary" onClick={restart}>
-            Volver al inicio
-          </button>
+
+          <div className="print-actions">
+            <button
+              className="btn"
+              type="button"
+              onClick={() => window.print()}
+            >
+              Exportar / guardar PDF
+            </button>
+
+            <button className="btn btn-secondary" onClick={restart}>
+              Volver al inicio
+            </button>
+          </div>
         </section>
       </main>
     );
