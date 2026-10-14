@@ -108,25 +108,6 @@ FORMA DE RESPONDER:
 - Si respondes un examen físico, puedes contestar como resultado observado: "Al examinarme, encuentra..." o "Me revisa y nota...".
 - Si el dato corresponde a signo vital o medición, puedes responder de forma directa.
 
-EJEMPLOS DE RESPUESTA ADECUADA:
-Estudiante: ¿Con quién vive?
-Paciente: Vivo con mi esposa, doctor. Mis hijos también están pendientes de mí.
-
-Estudiante: ¿Cuál es su EPS?
-Paciente: Estoy afiliada a Sura, doctora.
-
-Estudiante: ¿Qué se aprecia a la inspección general?
-Paciente: Me ve consciente y colaborador, pero con cara de malestar por lo que me está pasando.
-
-Estudiante: ¿Tiene antecedentes personales?
-Paciente: Pues sí, doctor, tengo la presión alta desde hace varios años.
-
-Estudiante: ¿Qué medicamentos toma?
-Paciente: Tomo los que me mandaron para la presión, pero no siempre me acuerdo bien de los nombres.
-
-Estudiante: Realizo auscultación pulmonar.
-Paciente: Me revisa la respiración y encuentra los hallazgos respiratorios de este paciente.
-
 TRANSCRIPCIÓN ACTUAL DE LA ENTREVISTA:
 ${transcript}
 
@@ -145,12 +126,12 @@ export function buildEvaluationPrompt(
   return `
 Eres un docente de semiología clínica evaluando una práctica con paciente virtual.
 
-Debes evaluar tres dimensiones:
-1. La entrevista clínica realizada por el estudiante.
-2. La historia clínica escrita o impresión final escrita por el estudiante.
+Evalúa tres dimensiones:
+1. La entrevista clínica realizada.
+2. La historia clínica escrita por el estudiante.
 3. El razonamiento semiológico y diagnóstico.
 
-Debes entregar retroalimentación académica clara, exigente, útil y formativa.
+La retroalimentación debe ser concreta, breve, útil y formativa.
 
 ESTUDIANTE:
 ${studentName || "Estudiante"}
@@ -179,16 +160,15 @@ ${formatList(selectedCase.evaluationChecklist)}
 TRANSCRIPCIÓN DE LA ENTREVISTA:
 ${transcript}
 
-TEXTO FINAL ESCRITO POR EL ESTUDIANTE:
+HISTORIA CLÍNICA / TEXTO FINAL ESCRITO POR EL ESTUDIANTE:
 ${diagnosticImpression}
 
-INSTRUCCIONES GENERALES PARA EVALUAR:
-1. Evalúa la calidad de la entrevista clínica, no solo si acertó el diagnóstico.
-2. Identifica qué información importante sí obtuvo el estudiante.
-3. Identifica qué información importante omitió.
-4. Evalúa si la entrevista fue ordenada, progresiva y semiológicamente útil.
-5. Evalúa si exploró adecuadamente el síntoma principal.
-6. Si el síntoma principal es dolor, evalúa explícitamente si usó ALICIA FREDUSA:
+CRITERIOS DE EVALUACIÓN:
+1. Calidad y orden de la entrevista clínica.
+2. Información clínica obtenida.
+3. Omisiones importantes.
+4. Caracterización semiológica del síntoma principal.
+5. Si el síntoma principal es dolor, evalúa internamente si aplicó ALICIA FREDUSA:
    - Aparición / antigüedad.
    - Localización.
    - Irradiación.
@@ -198,90 +178,66 @@ INSTRUCCIONES GENERALES PARA EVALUAR:
    - Frecuencia.
    - Duración.
    - Síntomas asociados.
-7. Evalúa si preguntó antecedentes pertinentes.
-8. Evalúa si exploró medicamentos, alergias, antecedentes familiares y revisión por sistemas cuando eran relevantes.
-9. Evalúa si solicitó examen físico pertinente.
-10. Evalúa si los hallazgos de examen físico que escribió coinciden con lo obtenido o con lo esperable del caso.
-11. Evalúa si la impresión diagnóstica está sustentada por datos positivos y negativos.
-12. Evalúa si propuso diagnósticos diferenciales razonables cuando aplica.
-13. No inventes preguntas que el estudiante no hizo.
-14. No le atribuyas datos obtenidos si no aparecen en la transcripción o en el texto final.
-15. No castigues al estudiante por no incluir un dato que nunca obtuvo, pero sí márcalo como omisión.
-16. Diferencia claramente entre:
-   - Información no preguntada.
-   - Información preguntada pero mal redactada.
-   - Información obtenida pero no usada en el razonamiento.
-17. Sé exigente, pero orientado a aprendizaje.
-18. Usa lenguaje claro para estudiantes de medicina.
-19. Debes dar una calificación final de 0.0 a 5.0.
+6. Antecedentes personales, medicamentos, alergias y familiares.
+7. Revisión por sistemas pertinente.
+8. Examen físico solicitado y hallazgos obtenidos.
+9. Redacción, orden, precisión y estructura de la historia clínica.
+10. Impresión diagnóstica y diagnósticos diferenciales.
+11. Sustento del razonamiento con datos positivos y negativos.
 
-CRITERIOS DE CALIFICACIÓN DE 0 A 5:
-- 4.5 a 5.0: entrevista organizada, datos clave completos, examen físico pertinente, historia bien redactada, razonamiento diagnóstico sólido.
-- 4.0 a 4.4: buen desempeño general, con omisiones menores o redacción mejorable.
-- 3.5 a 3.9: desempeño aceptable, obtiene varios datos relevantes pero omite elementos importantes.
-- 3.0 a 3.4: desempeño básico, entrevista incompleta, razonamiento parcial o historia clínica desorganizada.
-- 2.0 a 2.9: desempeño insuficiente, muchas omisiones relevantes, examen físico pobre o impresión poco sustentada.
-- 0.0 a 1.9: desempeño muy deficiente, no caracteriza el problema principal, no recoge datos mínimos o la impresión no se relaciona con el caso.
+NO inventes preguntas que el estudiante no hizo.
+NO atribuyas datos obtenidos si no aparecen en la transcripción o en la historia escrita.
+NO seas excesivamente largo.
+NO escribas una retroalimentación extensa.
+NO uses más de 4 bullets por sección.
 
-EVALÚA LA HISTORIA CLÍNICA ESCRITA:
-Si el texto final del estudiante está estructurado como historia clínica, evalúa estos apartados:
-- Identificación.
-- Motivo de consulta.
-- Enfermedad actual.
-- ALICIA FREDUSA si hay dolor.
-- Antecedentes personales.
-- Medicamentos.
-- Alergias.
-- Antecedentes familiares.
-- Revisión por sistemas pertinente.
-- Examen físico solicitado y hallazgos obtenidos.
-- Análisis semiológico.
-- Impresión diagnóstica.
-- Diagnósticos diferenciales.
+CALIFICACIÓN:
+Debes dar una nota final de 0.0 a 5.0.
 
-Si el estudiante solo escribió una impresión diagnóstica breve y no una historia clínica completa, evalúa la impresión, pero señala que faltó redacción completa de historia clínica.
+Criterios:
+- 4.5 a 5.0: excelente. Entrevista organizada, datos clave completos, examen físico pertinente, historia bien redactada y razonamiento sólido.
+- 4.0 a 4.4: buen desempeño. Omitió pocos elementos o tiene detalles de redacción por mejorar.
+- 3.5 a 3.9: aceptable. Obtuvo datos relevantes, pero dejó omisiones importantes.
+- 3.0 a 3.4: básico. Historia incompleta, semiología parcial o razonamiento débil.
+- 2.0 a 2.9: insuficiente. Muchas omisiones relevantes o impresión poco sustentada.
+- 0.0 a 1.9: muy deficiente. No caracteriza el problema principal o no logra una historia clínica útil.
 
 FORMATO OBLIGATORIO DE RESPUESTA:
 
-CALIFICACIÓN FINAL
-Nota: X.X / 5.0
+CALIFICACIÓN_FINAL: X.X
 
-Justificación breve de la nota:
-Escribe 3 a 5 líneas explicando por qué asignaste esa calificación.
+NIVEL: Excelente / Buen desempeño / Aceptable / Básico / Insuficiente / Muy deficiente
 
-RETROALIMENTACIÓN GENERAL
-Escribe un párrafo breve sobre el desempeño global.
+RESUMEN
+Escribe máximo 4 líneas. Debe ser directo y concreto.
 
-INFORMACIÓN CLÍNICA BIEN OBTENIDA
-- Menciona los datos relevantes que sí preguntó u obtuvo.
+LO MÁS LOGRADO
+- Máximo 3 bullets.
+- Menciona solo fortalezas reales.
 
-OMISIONES IMPORTANTES
-- Menciona los datos clínicos relevantes que faltaron.
-- Distingue omisiones de historia, antecedentes, revisión por sistemas y examen físico.
+OMISIONES CLAVE
+- Máximo 4 bullets.
+- Prioriza lo más importante del caso.
 
-USO DE ALICIA FREDUSA
-- Si el caso tenía dolor, evalúa si caracterizó aparición, localización, irradiación, característica, intensidad, atenuantes/agravantes, frecuencia, duración y síntomas asociados.
-- Si el caso no tenía dolor como síntoma principal, escribe: "No era el eje principal de este caso".
+HISTORIA CLÍNICA Y REDACCIÓN
+- Máximo 3 bullets.
+- Evalúa estructura, claridad, orden y precisión.
 
-EXAMEN FÍSICO Y SEMIOLOGÍA
-- Comenta si solicitó examen físico pertinente.
-- Menciona qué hallazgos físicos eran claves.
-- Señala si faltaron maniobras o sistemas relevantes.
+RAZONAMIENTO CLÍNICO
+- Máximo 3 bullets.
+- Evalúa impresión diagnóstica, diferenciales y sustento semiológico.
 
-REDACCIÓN DE LA HISTORIA CLÍNICA
-- Evalúa orden, claridad, coherencia, precisión semiológica y uso adecuado de lenguaje médico.
-- Señala si mezcló datos subjetivos y objetivos.
-- Señala si faltó cronología o estructura.
-
-IMPRESIÓN DIAGNÓSTICA Y RAZONAMIENTO
-- Comenta si la impresión fue coherente con la información obtenida.
-- Indica si sustentó el diagnóstico con datos positivos y negativos.
-- Menciona diagnósticos diferenciales relevantes.
-
-RECOMENDACIONES PARA MEJORAR
-- Da recomendaciones concretas y accionables para una próxima entrevista.
+PRÓXIMO PASO PARA MEJORAR
+- Máximo 3 recomendaciones concretas.
 
 CIERRE
-Termina con una frase breve de orientación académica.
+Una frase breve de orientación académica.
+
+IMPORTANTE:
+La primera línea debe ser exactamente:
+CALIFICACIÓN_FINAL: X.X
+
+Ejemplo:
+CALIFICACIÓN_FINAL: 3.6
 `.trim();
 }
