@@ -35,6 +35,54 @@ type Step = "login" | "selectCase" | "chat" | "diagnosis" | "evaluation";
 const CONSULTATION_LIMIT_SECONDS = 30 * 60;
 const STORAGE_PREFIX = "semiologia-interactiva";
 
+const CLINICAL_HISTORY_TEMPLATE = `HISTORIA CLÍNICA
+
+1. Identificación
+Nombre:
+Edad:
+Sexo:
+Ocupación:
+Procedencia / residencia:
+
+2. Motivo de consulta
+Escribe el motivo de consulta en palabras del paciente:
+
+3. Enfermedad actual
+Describe de forma cronológica el problema actual:
+
+Si el síntoma principal es dolor, usa ALICIA FREDUSA:
+Aparición / antigüedad:
+Localización:
+Irradiación:
+Característica:
+Intensidad:
+Atenuantes / agravantes:
+Frecuencia:
+Duración:
+Síntomas asociados:
+
+4. Antecedentes personales
+
+5. Medicamentos
+
+6. Alergias
+
+7. Antecedentes familiares
+
+8. Revisión por sistemas pertinente
+
+9. Examen físico solicitado y hallazgos obtenidos
+
+10. Análisis semiológico
+Datos positivos:
+Datos negativos relevantes:
+Interpretación semiológica:
+
+11. Impresión diagnóstica
+
+12. Diagnósticos diferenciales
+`;
+
 function formatTime(totalSeconds: number): string {
   const safeSeconds = Math.max(0, totalSeconds);
   const minutes = Math.floor(safeSeconds / 60);
@@ -223,6 +271,13 @@ export default function HomePage() {
 
     return () => window.clearInterval(interval);
   }, [step, caseStartedAt, professorMode]);
+
+  useEffect(() => {
+    if (step !== "diagnosis") return;
+    if (diagnosticImpression.trim()) return;
+
+    setDiagnosticImpression(CLINICAL_HISTORY_TEMPLATE);
+  }, [step, diagnosticImpression]);
 
   async function loadCaseOptions() {
     const res = await fetch("/api/cases");
@@ -457,7 +512,7 @@ export default function HomePage() {
               <h1>Semiología Interactiva</h1>
               <p className="subtitle">
                 Paciente virtual para practicar entrevista clínica, observación dirigida,
-                examen físico y construcción de una impresión final.
+                examen físico y construcción de una historia clínica.
               </p>
             </div>
 
@@ -471,8 +526,8 @@ export default function HomePage() {
                 <span>Casos clínicos simulados</span>
               </div>
               <div>
-                <strong>Modo profesor</strong>
-                <span>Acceso sin límite de tiempo</span>
+                <strong>Evaluación 0 a 5</strong>
+                <span>Historia clínica, semiología y razonamiento</span>
               </div>
             </div>
 
@@ -537,7 +592,7 @@ export default function HomePage() {
               <p>
                 {professorMode
                   ? "Modo profesor activo: no tendrás límite de tiempo y podrás repetir casos."
-                  : "Tienes 30 minutos. Al terminar, presiona Finalizar y escribe tu impresión final."}
+                  : "Tienes 30 minutos. Al terminar, presiona Historia clínica y diligencia el formato final."}
               </p>
             </div>
 
@@ -606,19 +661,29 @@ export default function HomePage() {
     return (
       <main className="container">
         <section className="card evaluation">
-          <span className="kicker">Cierre del caso</span>
-          <h1>Impresión final</h1>
+          <span className="kicker">Formato de historia clínica</span>
+          <h1>Historia clínica del paciente virtual</h1>
 
           {timeExpired && (
             <p className="error">
-              El tiempo de consulta terminó. Escribe ahora tu impresión final con la información obtenida.
+              El tiempo de consulta terminó. Diligencia la historia clínica con la información que alcanzaste a obtener.
             </p>
           )}
 
           <p className="subtitle">
-            {studentName}, escribe tu impresión diagnóstica completa o impresión académica final.
-            Incluye los datos que sustentan tu razonamiento.
+            {studentName}, completa la historia clínica con los datos obtenidos durante la entrevista.
+            La retroalimentación evaluará la información recogida, la redacción, la semiología,
+            el uso de ALICIA FREDUSA cuando aplique y la impresión diagnóstica.
           </p>
+
+          <div className="instruction-panel">
+            <strong>Recuerda</strong>
+            <p>Redacta como historia clínica, no como lista de preguntas.</p>
+            <p>Si el síntoma principal es dolor, usa ALICIA FREDUSA.</p>
+            <p>Incluye datos positivos y negativos relevantes.</p>
+            <p>No inventes datos que no obtuviste durante la entrevista.</p>
+            <p>La calificación final será de 0 a 5.</p>
+          </div>
 
           <form className="form-grid" onSubmit={evaluateCase}>
             <textarea
@@ -630,13 +695,14 @@ export default function HomePage() {
               onDrop={blockClipboardAction}
               onContextMenu={(e) => e.preventDefault()}
               onKeyDown={blockClipboardKeys}
-              placeholder="Escribe aquí tu impresión final..."
+              placeholder="Diligencia aquí la historia clínica..."
+              rows={22}
             />
 
             {error && <p className="error">{error}</p>}
 
             <button className="btn" disabled={loading}>
-              {loading ? "Evaluando..." : "Generar retroalimentación"}
+              {loading ? "Evaluando..." : "Generar retroalimentación y calificación"}
             </button>
           </form>
         </section>
@@ -745,7 +811,7 @@ export default function HomePage() {
           onClick={() => setStep("diagnosis")}
           disabled={loading || messages.length < 2}
         >
-          Finalizar
+          Historia clínica
         </button>
       </form>
     </main>
